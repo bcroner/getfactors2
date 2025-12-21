@@ -43,5 +43,12 @@ void simp_vector_append(__int64** v, __int64* vtop, __int64* vcap, __int64 data)
 
 }
 
+void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n) {
+
+}
+
+bool SATSolver_isSat(SATSolver* s, bool* sln) {
+    return true;
+}
 
 #endif
