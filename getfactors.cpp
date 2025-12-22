@@ -118,6 +118,10 @@ char* nat_test_add(__int64 * len_para) {
 
         is_sat = SATSolver_isSat(s, sln);
 
+        SATSolver_destroy(s);
+
+        delete s;
+
         if (!is_sat)
             return prime_str;
     }
@@ -252,6 +256,10 @@ char* nat_test_mul(__int64 * len_para) {
 
         is_sat = SATSolver_isSat(s, sln);
 
+        SATSolver_destroy(s);
+
+        delete s;
+
         if (!is_sat)
             return prime_str;
     }
@@ -381,6 +389,10 @@ char* nat_test_equals(__int64 * len_para) {
     SATSolver_create(s, input, k, num_para - 1);
 
     is_sat = SATSolver_isSat(s, sln);
+
+    SATSolver_destroy(s);
+
+    delete s;
 
     if (!is_sat)
         return prime_str;

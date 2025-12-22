@@ -1674,22 +1674,16 @@ char* dec_get_factors(char* c_str, __int64 c_str_buf_sz, __int64 * len_para) {
     char* prime_str = new char[8];
     sprintf_s(prime_str, 8, "prime");
 
-    __int64 search_sz = 1;
-
-    for (__int64 i = 0; i < master->chops; i++)
-        search_sz *= 2;
-
     bool is_sat = false;
 
-    for (__int64 i = 0; i < search_sz; i++) {
+    SATSolver* s = new SATSolver();
+    SATSolver_create(s, input, k, num_para - 1);
 
-        SATSolver* s = new SATSolver();
-        SATSolver_create(s, master, input, k, num_para - 1, i);
+    is_sat = SATSolver_isSat(s, sln);
 
-        is_sat = SATSolver_isSat(s, i, sln);
-        if (is_sat)
-            break;
-    }
+    SATSolver_destroy(s);
+
+    delete s;
 
     if (!is_sat)
         return prime_str;
@@ -1833,28 +1827,19 @@ char* nat_get_factors(char* c_str, __int64 c_str_buf_sz, __int64 * len_para) {
 
     delete[] buf_3sat;
 
-    SATSolverMaster* master = new SATSolverMaster();
-    SATSolverMaster_create(master, input, k, num_para - 1, 0);
-
     char* prime_str = new char[8];
     sprintf_s(prime_str, 8, "prime");
 
-    __int64 search_sz = 1;
-
-    for (__int64 i = 0; i < master->chops; i++)
-        search_sz *= 2;
-
     bool is_sat = false;
 
-    for (__int64 i = 0; i < search_sz; i++) {
+    SATSolver* s = new SATSolver();
+    SATSolver_create(s, input, k, num_para - 1);
 
-        SATSolver* s = new SATSolver();
-        SATSolver_create(s, master, input, k, num_para - 1, i);
+    is_sat = SATSolver_isSat(s, sln);
+        
+    SATSolver_destroy(s);
 
-        is_sat = SATSolver_isSat(s, i, sln);
-        if (is_sat)
-            break;
-    }
+    delete s;
 
     if (!is_sat)
         return prime_str;
