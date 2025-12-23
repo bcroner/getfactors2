@@ -27,7 +27,8 @@ typedef struct SATSolver_tag {
 	__int64  cdnr_vtop;	// vector top
 	__int64  cdnr_vcap;	// vector capacity
 
-	__int64* var_ref;	// variable reference into encoding NAND
+	__int64* varref_neg;// variable reference into encoding NAND, negated
+	__int64* varref_pos;// variable reference into encoding NAND, non-negated
 
 } SATSolver;
 

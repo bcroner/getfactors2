@@ -49,13 +49,14 @@ void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n) {
 
 void SATSolver_destroy(SATSolver* s) {
     
-    delete [] s->in_nand_l;
-    delete [] s->in_nand_r;
+    delete[] s->in_nand_l;
+    delete[] s->in_nand_r;
 
-    delete [] s->cd_nand_l;
-    delete [] s->cd_nand_r;
+    delete[] s->cd_nand_l;
+    delete[] s->cd_nand_r;
 
-    delete [] s->var_ref;
+    delete[] s->varref_neg;
+    delete[] s->varref_pos;
 }
 
 bool SATSolver_isSat(SATSolver* s, bool* sln) {
