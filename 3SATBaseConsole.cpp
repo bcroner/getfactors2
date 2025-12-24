@@ -87,36 +87,60 @@ void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n) {
 
     s->op = new bool* [n];
     s->inopcell_l = new __int64* [n];
+    s->inopcell_m = new __int64* [n];
     s->inopcell_r = new __int64* [n];
 
     s->cdopcelll = new __int64* [n];
     s->cdopcellr = new __int64* [n];
+
+    s->op_vtop = new __int64[n];
+    s->op_vcap = new __int64[n];
+
+    s->inol_vtop = new __int64[n];
+    s->inol_vcap = new __int64[n];
+
+    s->inom_vtop = new __int64[n];
+    s->inom_vcap = new __int64[n];
+
+    s->inor_vtop = new __int64[n];
+    s->inor_vcap = new __int64[n];
+
+    s->cdol_vtop = new __int64[n];
+    s->cdol_vcap = new __int64[n];
+
+    s->cdor_vtop = new __int64[n];
+    s->cdor_vcap = new __int64[n];
 
     for (__int64 i = 0; i < n; i++) {
 
         s->op[i] = simp_bool_vector_create(16);
 
         s->inopcell_l[i] = simp_vector_create(16);
+        s->inopcell_m[i] = simp_vector_create(16);
         s->inopcell_r[i] = simp_vector_create(16);
 
         s->cdopcelll[i] = simp_vector_create(16);
         s->cdopcellr[i] = simp_vector_create(16);
+
+        s->op_vtop[i] = 0;
+        s->op_vcap[i] = 0;
+
+        s->inol_vtop[i] = 0;
+        s->inol_vcap[i] = 0;
+
+        s->inom_vtop[i] = 0;
+        s->inom_vcap[i] = 0;
+
+        s->inor_vtop[i] = 0;
+        s->inor_vcap[i] = 0;
+
+        s->cdol_vtop[i] = 0;
+        s->cdol_vcap[i] = 0;
+
+        s->cdor_vtop[i] = 0;
+        s->cdor_vcap[i] = 0;
+
     }
-
-    s->op_vtop = new __int64 [n];
-    s->op_vcap = new __int64 [n];
-
-    s->inol_vtop = new __int64 [n];
-    s->inol_vcap = new __int64 [n];
-
-    s->inor_vtop = new __int64 [n];
-    s->inor_vcap = new __int64 [n];
-
-    s->cdol_vtop = new __int64 [n];
-    s->cdol_vcap = new __int64 [n];
-
-    s->cdor_vtop = new __int64 [n];
-    s->cdor_vcap = new __int64 [n];
 
 }
 
