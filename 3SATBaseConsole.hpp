@@ -16,10 +16,10 @@ typedef struct SATSolver_tag {
 	__int64* inopcell_m;	// instance operation cell middle
 	__int64* inopcell_r;	// instance operation cell right
 
-	bool** op;				// operation- true for AND, false for OR
+	bool* op;				// operation- true for AND, false for OR
 
-	__int64* op_vtop;		// vector top
-	__int64* op_vcap;		// vector capacity
+	__int64 op_vtop;		// operation vector top
+	__int64 op_vcap;		// operation vector capacity
 
 	__int64** cdopcelll;	// encoding operation cell left
 	__int64** cdopcellr;	// encoding operation cell right
@@ -33,6 +33,8 @@ typedef struct SATSolver_tag {
 } SATSolver;
 
 bool* simp_bool_vector_create(__int64 init_sz);
+bool simp_vector_read(bool* v, __int64 vtop, __int64 vcap, __int64 loc);
+void simp_vector_append(bool** v, __int64* vtop, __int64* vcap, bool data);
 __int64* simp_vector_create(__int64 init_sz);
 __int64 simp_vector_read(__int64* v, __int64 vtop, __int64 vcap, __int64 loc);
 void simp_vector_append(__int64** v, __int64* vtop, __int64* vcap, __int64 data);

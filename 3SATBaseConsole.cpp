@@ -23,7 +23,7 @@ bool simp_vector_read(bool* v, __int64 vtop, __int64 vcap, __int64 loc) {
     return v[loc];
 }
 
-void simp_vector_append(bool** v, __int64* vtop, __int64* vcap, bool data) {
+void simp_bool_vector_append(bool** v, __int64* vtop, __int64* vcap, bool data) {
 
     *vtop = *vtop + 1;
 
@@ -95,10 +95,10 @@ void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n) {
         s->inopcell_r[i] = lst[i][2];
     }
 
-    s->op = new bool* [n];
+    s->op = simp_bool_vector_create(16);
+    s->op_vtop = -1;
+    s->op_vcap = 16;
 
-    s->op_vtop = new __int64[n];
-    s->op_vcap = new __int64[n];
 
     s->cdopcelll = new __int64* [n];
     s->cdopcellr = new __int64* [n];
@@ -110,11 +110,6 @@ void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n) {
     s->cdor_vcap = new __int64[n];
 
     for (__int64 i = 0; i < n; i++) {
-
-        s->op[i] = simp_bool_vector_create(16);
-
-        s->op_vtop[i] = 0;
-        s->op_vcap[i] = 0;
 
         s->cdopcelll[i] = simp_vector_create(16);
         s->cdopcellr[i] = simp_vector_create(16);
@@ -132,7 +127,6 @@ void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n) {
 void SATSolver_destroy(SATSolver* s) {
 
     for (__int64 i = 0; i < s->n; i++) {
-        delete[] s->op[i];
 
         delete[] s->cdopcelll[i];
         delete[] s->cdopcellr[i];
@@ -142,8 +136,7 @@ void SATSolver_destroy(SATSolver* s) {
     delete[] s->inopcell_m;
     delete[] s->inopcell_r;
 
-    delete[] s->op_vtop;
-    delete[] s->op_vcap;
+    delete[] s->op;
 
     delete[] s->cdopcelll;
     delete[] s->cdopcellr;
@@ -154,8 +147,6 @@ void SATSolver_destroy(SATSolver* s) {
     delete[] s->cdor_vtop;
     delete[] s->cdor_vcap;
     
-    delete[] s->op;
-
     delete[] s->inopcell_l;
     delete[] s->inopcell_r;
 
@@ -164,6 +155,62 @@ void SATSolver_destroy(SATSolver* s) {
 }
 
 bool SATSolver_isSat(SATSolver* s, bool* sln) {
+
+    // place instance variables into encoding
+
+    for (__int64 i = 0; i < s->n; i++) {
+        for (__int64 j = 0; j < s->k; i++) {
+
+            __int64 abs_l = s->inopcell_l[j] < 0 ? -s->inopcell_l[j] : s->inopcell_l[j];
+            __int64 abs_m = s->inopcell_m[j] < 0 ? -s->inopcell_m[j] : s->inopcell_m[j];
+            __int64 abs_r = s->inopcell_r[j] < 0 ? -s->inopcell_r[j] : s->inopcell_r[j];
+
+            if (abs_l - 2 == i && s->inopcell_l[j] < 0) {
+
+                simp_bool_vector_append(&(s->op), &(s->op_vtop), &(s->op_vcap), false);
+                simp_vector_append(&(s->cdopcelll[i]), &(s->cdol_vtop[i]), &(s->cdol_vcap[i]), s->inopcell_m[j]);
+                simp_vector_append(&(s->cdopcellr[i]), &(s->cdol_vtop[i]), &(s->cdol_vcap[i]), s->inopcell_r[j]);
+
+            }
+            else if (abs_l - 2 == i) {
+
+                simp_bool_vector_append(&(s->op), &(s->op_vtop), &(s->op_vcap), true);
+                simp_vector_append(&(s->cdopcelll[i]), &(s->cdol_vtop[i]), &(s->cdol_vcap[i]), - s->inopcell_m[j]);
+                simp_vector_append(&(s->cdopcellr[i]), &(s->cdol_vtop[i]), &(s->cdol_vcap[i]), - s->inopcell_r[j]);
+
+            }
+            else if (abs_m - 2 == i && s->inopcell_m[j] < 0) {
+
+                simp_bool_vector_append(&(s->op), &(s->op_vtop), &(s->op_vcap), false);
+                simp_vector_append(&(s->cdopcelll[i]), &(s->cdol_vtop[i]), &(s->cdol_vcap[i]), s->inopcell_l[j]);
+                simp_vector_append(&(s->cdopcellr[i]), &(s->cdol_vtop[i]), &(s->cdol_vcap[i]), s->inopcell_r[j]);
+
+            }
+            else if (abs_m - 2 == i) {
+
+                simp_bool_vector_append(&(s->op), &(s->op_vtop), &(s->op_vcap), true);
+                simp_vector_append(&(s->cdopcelll[i]), &(s->cdol_vtop[i]), &(s->cdol_vcap[i]), -s->inopcell_l[j]);
+                simp_vector_append(&(s->cdopcellr[i]), &(s->cdol_vtop[i]), &(s->cdol_vcap[i]), -s->inopcell_r[j]);
+
+            }
+            else if (abs_r - 2 == i && s->inopcell_r[j] < 0) {
+
+                simp_bool_vector_append(&(s->op), &(s->op_vtop), &(s->op_vcap), false);
+                simp_vector_append(&(s->cdopcelll[i]), &(s->cdol_vtop[i]), &(s->cdol_vcap[i]), s->inopcell_l[j]);
+                simp_vector_append(&(s->cdopcellr[i]), &(s->cdol_vtop[i]), &(s->cdol_vcap[i]), s->inopcell_m[j]);
+
+            }
+            else if (abs_r - 2 == i) {
+
+                simp_bool_vector_append(&(s->op), &(s->op_vtop), &(s->op_vcap), true);
+                simp_vector_append(&(s->cdopcelll[i]), &(s->cdol_vtop[i]), &(s->cdol_vcap[i]), -s->inopcell_l[j]);
+                simp_vector_append(&(s->cdopcellr[i]), &(s->cdol_vtop[i]), &(s->cdol_vcap[i]), -s->inopcell_m[j]);
+
+            }
+
+        }
+    }
+
     return true;
 }
 
