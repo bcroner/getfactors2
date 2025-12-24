@@ -9,23 +9,28 @@
 
 typedef struct SATSolver_tag {
 
-	__int64* in_nand_l;	// instance NAND left
-	__int64* in_nand_r;	// instance NAND right
+	bool* op;			// operation- true for AND, false for OR
 
-	__int64  innl_vtop;	// vector top
-	__int64  innl_vcap;	// vector capacity
+	__int64  op_vtop;	// vector top
+	__int64  op_vcap;	// vector capacity
 
-	__int64  innr_vtop;	// vector top
-	__int64  innr_vcap;	// vector capacity
+	__int64* inopcell_l;// instance operation cell left
+	__int64* inopcell_r;// instance operation cell right
 
-	__int64* cd_nand_l;	// encoding NAND left
-	__int64* cd_nand_r;	// encoding NAND right
+	__int64  inol_vtop;	// vector top
+	__int64  inol_vcap;	// vector capacity
 
-	__int64  cdnl_vtop;	// vector top
-	__int64  cdnl_vcap;	// vector capacity
+	__int64  inor_vtop;	// vector top
+	__int64  inor_vcap;	// vector capacity
 
-	__int64  cdnr_vtop;	// vector top
-	__int64  cdnr_vcap;	// vector capacity
+	__int64* cdopcelll;	// encoding operation cell left
+	__int64* cdopcellr;	// encoding operation cell right
+
+	__int64  cdol_vtop;	// vector top
+	__int64  cdol_vcap;	// vector capacity
+
+	__int64  cdor_vtop;	// vector top
+	__int64  cdor_vcap;	// vector capacity
 
 	__int64* varref;	// variable reference into encoding NAND
 
