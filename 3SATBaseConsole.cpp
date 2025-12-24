@@ -55,8 +55,7 @@ void SATSolver_destroy(SATSolver* s) {
     delete[] s->cd_nand_l;
     delete[] s->cd_nand_r;
 
-    delete[] s->varref_neg;
-    delete[] s->varref_pos;
+    delete[] s->varref;
 }
 
 bool SATSolver_isSat(SATSolver* s, bool* sln) {
