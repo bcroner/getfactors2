@@ -12,11 +12,9 @@ typedef struct SATSolver_tag {
 	__int64 n;
 	__int64 k;
 
-	__int64** lst;			// list of clauses
-
-	__int64** inopcell_l;	// instance operation cell left
-	__int64** inopcell_m;	// instance operation cell middle
-	__int64** inopcell_r;	// instance operation cell right
+	__int64* inopcell_l;	// instance operation cell left
+	__int64* inopcell_m;	// instance operation cell middle
+	__int64* inopcell_r;	// instance operation cell right
 
 	__int64*  inol_vtop;	// vector top
 	__int64*  inol_vcap;	// vector capacity
