@@ -122,11 +122,11 @@ void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n) {
 
         s->op[i] = simp_bool_vector_create(16);
 
-        s->cdopcelll[i] = simp_vector_create(16);
-        s->cdopcellr[i] = simp_vector_create(16);
-
         s->op_vtop[i] = 0;
         s->op_vcap[i] = 0;
+
+        s->cdopcelll[i] = simp_vector_create(16);
+        s->cdopcellr[i] = simp_vector_create(16);
 
         s->inol_vtop[i] = 0;
         s->inol_vcap[i] = 0;
