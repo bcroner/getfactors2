@@ -8,6 +8,42 @@
 
 #include <stdio.h>
 
+bool* simp_bool_vector_create(__int64 init_sz) {
+
+    bool* ret = new bool[init_sz];
+    return ret;
+
+}
+
+bool simp_vector_read(bool* v, __int64 vtop, __int64 vcap, __int64 loc) {
+
+    if (loc > vtop)
+        return 0;
+
+    return v[loc];
+}
+
+void simp_vector_append(bool** v, __int64* vtop, __int64* vcap, bool data) {
+
+    *vtop = *vtop + 1;
+
+    if (*vtop < *vcap)
+        *v[*vtop] = data;
+    else {
+        bool* newv = new bool[*vcap * 2];
+        for (__int64 i = 0; i < *vcap * 2; i++)
+            newv[i] = 0;
+        for (__int64 i = 0; i < *vcap; i++)
+            newv[i] = *v[i];
+        *vcap *= 2;
+        delete[] * v;
+        *v = newv;
+        *v[*vtop] = data;
+    }
+
+}
+
+
 __int64* simp_vector_create(__int64 init_sz) {
 
     __int64* ret = new __int64[init_sz];
@@ -56,6 +92,17 @@ void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n) {
     s->cdopcelll = new __int64* [n];
     s->cdopcellr = new __int64* [n];
 
+    for (__int64 i = 0; i < n; i++) {
+
+        s->op[i] = simp_bool_vector_create(16);
+
+        s->inopcell_l[i] = simp_vector_create(16);
+        s->inopcell_r[i] = simp_vector_create(16);
+
+        s->cdopcelll[i] = simp_vector_create(16);
+        s->cdopcellr[i] = simp_vector_create(16);
+    }
+
     s->op_vtop = new __int64 [n];
     s->op_vcap = new __int64 [n];
 
@@ -64,9 +111,6 @@ void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n) {
 
     s->inor_vtop = new __int64 [n];
     s->inor_vcap = new __int64 [n];
-
-    s->cdopcelll = new __int64* [n];
-    s->cdopcellr = new __int64* [n];
 
     s->cdol_vtop = new __int64 [n];
     s->cdol_vcap = new __int64 [n];

@@ -39,6 +39,7 @@ typedef struct SATSolver_tag {
 
 } SATSolver;
 
+bool* simp_bool_vector_create(__int64 init_sz);
 __int64* simp_vector_create(__int64 init_sz);
 __int64 simp_vector_read(__int64* v, __int64 vtop, __int64 vcap, __int64 loc);
 void simp_vector_append(__int64** v, __int64* vtop, __int64* vcap, __int64 data);
