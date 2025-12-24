@@ -84,16 +84,24 @@ void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n) {
     s->k = k;
     s->n = n;
 
-    s->op = new bool* [n];
-    s->inopcell_l = new __int64 [n];
-    s->inopcell_m = new __int64 [n];
-    s->inopcell_r = new __int64 [n];
+    s->inopcell_l = new __int64 [k];
+    s->inopcell_m = new __int64 [k];
+    s->inopcell_r = new __int64 [k];
 
-    s->cdopcelll = new __int64* [n];
-    s->cdopcellr = new __int64* [n];
+    for (__int64 i = 0; i < k; i++) {
+
+        s->inopcell_l[i] = lst[i][0];
+        s->inopcell_m[i] = lst[i][1];
+        s->inopcell_r[i] = lst[i][2];
+    }
+
+    s->op = new bool* [n];
 
     s->op_vtop = new __int64[n];
     s->op_vcap = new __int64[n];
+
+    s->cdopcelll = new __int64* [n];
+    s->cdopcellr = new __int64* [n];
 
     s->inol_vtop = new __int64[n];
     s->inol_vcap = new __int64[n];
@@ -111,10 +119,6 @@ void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n) {
     s->cdor_vcap = new __int64[n];
 
     for (__int64 i = 0; i < n; i++) {
-
-        s->inopcell_l[i] = lst[i][0];
-        s->inopcell_m[i] = lst[i][1];
-        s->inopcell_r[i] = lst[i][2];
 
         s->op[i] = simp_bool_vector_create(16);
 
