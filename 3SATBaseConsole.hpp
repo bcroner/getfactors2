@@ -16,15 +16,6 @@ typedef struct SATSolver_tag {
 	__int64* inopcell_m;	// instance operation cell middle
 	__int64* inopcell_r;	// instance operation cell right
 
-	__int64*  inol_vtop;	// vector top
-	__int64*  inol_vcap;	// vector capacity
-
-	__int64* inom_vtop;		// vector top
-	__int64* inom_vcap;		// vector capacity
-
-	__int64*  inor_vtop;	// vector top
-	__int64*  inor_vcap;	// vector capacity
-
 	bool** op;				// operation- true for AND, false for OR
 
 	__int64* op_vtop;		// vector top

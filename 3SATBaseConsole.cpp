@@ -103,15 +103,6 @@ void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n) {
     s->cdopcelll = new __int64* [n];
     s->cdopcellr = new __int64* [n];
 
-    s->inol_vtop = new __int64[n];
-    s->inol_vcap = new __int64[n];
-
-    s->inom_vtop = new __int64[n];
-    s->inom_vcap = new __int64[n];
-
-    s->inor_vtop = new __int64[n];
-    s->inor_vcap = new __int64[n];
-
     s->cdol_vtop = new __int64[n];
     s->cdol_vcap = new __int64[n];
 
@@ -127,15 +118,6 @@ void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n) {
 
         s->cdopcelll[i] = simp_vector_create(16);
         s->cdopcellr[i] = simp_vector_create(16);
-
-        s->inol_vtop[i] = 0;
-        s->inol_vcap[i] = 0;
-
-        s->inom_vtop[i] = 0;
-        s->inom_vcap[i] = 0;
-
-        s->inor_vtop[i] = 0;
-        s->inor_vcap[i] = 0;
 
         s->cdol_vtop[i] = 0;
         s->cdol_vcap[i] = 0;
@@ -162,12 +144,6 @@ void SATSolver_destroy(SATSolver* s) {
 
     delete[] s->op_vtop;
     delete[] s->op_vcap;
-
-    delete[] s->inol_vtop;
-    delete[] s->inol_vcap;
-
-    delete[] s->inor_vtop;
-    delete[] s->inor_vcap;
 
     delete[] s->cdopcelll;
     delete[] s->cdopcellr;
