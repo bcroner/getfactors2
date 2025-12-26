@@ -97,47 +97,26 @@ void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n) {
         s->inopcell_r[i] = lst[i][2];
     }
 
-    s->cdopcelll_f = new __int64* [n];
-    s->cdopcellr_f = new __int64* [n];
+    s->cdopcelll_f = simp_vector_create(16);
+    s->cdopcellr_f = simp_vector_create(16);
 
-    s->cdopcelll_t = new __int64* [n];
-    s->cdopcellr_t = new __int64* [n];
+    s->cdopcelll_t = simp_vector_create(16);
+    s->cdopcellr_t = simp_vector_create(16);
 
-    s->cdol_vtop_f = new __int64[n];
-    s->cdol_vcap_f = new __int64[n];
+    s->cdol_vtop_f = 0;
+    s->cdol_vcap_f = 0;
 
-    s->cdol_vtop_t = new __int64[n];
-    s->cdol_vcap_t = new __int64[n];
+    s->cdol_vtop_t = 0;
+    s->cdol_vcap_t = 0;
 
-    s->cdor_vtop_f = new __int64[n];
-    s->cdor_vcap_f = new __int64[n];
+    s->cdor_vtop_f = 0;
+    s->cdor_vcap_f = 0;
 
-    s->cdor_vtop_t = new __int64[n];
-    s->cdor_vcap_t = new __int64[n];
+    s->cdor_vtop_t = 0;
+    s->cdor_vcap_t = 0;
 
-
-    for (__int64 i = 0; i < n; i++) {
-
-        s->cdopcelll_f[i] = simp_vector_create(16);
-        s->cdopcellr_f[i] = simp_vector_create(16);
-
-        s->cdopcelll_t[i] = simp_vector_create(16);
-        s->cdopcellr_t[i] = simp_vector_create(16);
-
-
-        s->cdol_vtop_f[i] = 0;
-        s->cdol_vcap_f[i] = 0;
-
-        s->cdol_vtop_t[i] = 0;
-        s->cdol_vcap_t[i] = 0;
-
-        s->cdor_vtop_f[i] = 0;
-        s->cdor_vcap_f[i] = 0;
-
-        s->cdor_vtop_t[i] = 0;
-        s->cdor_vcap_t[i] = 0;
-
-    }
+    s->varref_f = new __int64[n];
+    s->varref_t = new __int64[n];
 
     // place instance variables into encoding
 
@@ -150,38 +129,38 @@ void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n) {
 
             if (abs_l - 2 == i && s->inopcell_l[j] < 0) {
 
-                simp_vector_append(&(s->cdopcelll_t[i]), &(s->cdol_vtop_t[i]), &(s->cdol_vcap_t[i]), s->inopcell_m[j]);
-                simp_vector_append(&(s->cdopcellr_t[i]), &(s->cdol_vtop_t[i]), &(s->cdol_vcap_t[i]), s->inopcell_r[j]);
+                simp_vector_append(&(s->cdopcelll_t), &(s->cdol_vtop_t), &(s->cdol_vcap_t), s->inopcell_m[j]);
+                simp_vector_append(&(s->cdopcellr_t), &(s->cdol_vtop_t), &(s->cdol_vcap_t), s->inopcell_r[j]);
 
             }
             else if (abs_l - 2 == i) {
 
-                simp_vector_append(&(s->cdopcelll_f[i]), &(s->cdol_vtop_f[i]), &(s->cdol_vcap_f[i]), s->inopcell_m[j]);
-                simp_vector_append(&(s->cdopcellr_f[i]), &(s->cdol_vtop_f[i]), &(s->cdol_vcap_f[i]), s->inopcell_r[j]);
+                simp_vector_append(&(s->cdopcelll_f), &(s->cdol_vtop_f), &(s->cdol_vcap_f), s->inopcell_m[j]);
+                simp_vector_append(&(s->cdopcellr_f), &(s->cdol_vtop_f), &(s->cdol_vcap_f), s->inopcell_r[j]);
 
             }
             else if (abs_m - 2 == i && s->inopcell_m[j] < 0) {
 
-                simp_vector_append(&(s->cdopcelll_t[i]), &(s->cdol_vtop_t[i]), &(s->cdol_vcap_t[i]), s->inopcell_l[j]);
-                simp_vector_append(&(s->cdopcellr_t[i]), &(s->cdol_vtop_t[i]), &(s->cdol_vcap_t[i]), s->inopcell_r[j]);
+                simp_vector_append(&(s->cdopcelll_t), &(s->cdol_vtop_t), &(s->cdol_vcap_t), s->inopcell_l[j]);
+                simp_vector_append(&(s->cdopcellr_t), &(s->cdol_vtop_t), &(s->cdol_vcap_t), s->inopcell_r[j]);
 
             }
             else if (abs_m - 2 == i) {
 
-                simp_vector_append(&(s->cdopcelll_f[i]), &(s->cdol_vtop_f[i]), &(s->cdol_vcap_f[i]), s->inopcell_l[j]);
-                simp_vector_append(&(s->cdopcellr_f[i]), &(s->cdol_vtop_f[i]), &(s->cdol_vcap_f[i]), s->inopcell_r[j]);
+                simp_vector_append(&(s->cdopcelll_f), &(s->cdol_vtop_f), &(s->cdol_vcap_f), s->inopcell_l[j]);
+                simp_vector_append(&(s->cdopcellr_f), &(s->cdol_vtop_f), &(s->cdol_vcap_f), s->inopcell_r[j]);
 
             }
             else if (abs_r - 2 == i && s->inopcell_r[j] < 0) {
 
-                simp_vector_append(&(s->cdopcelll_t[i]), &(s->cdol_vtop_t[i]), &(s->cdol_vcap_t[i]), s->inopcell_l[j]);
-                simp_vector_append(&(s->cdopcellr_t[i]), &(s->cdol_vtop_t[i]), &(s->cdol_vcap_t[i]), s->inopcell_m[j]);
+                simp_vector_append(&(s->cdopcelll_t), &(s->cdol_vtop_t), &(s->cdol_vcap_t), s->inopcell_l[j]);
+                simp_vector_append(&(s->cdopcellr_t), &(s->cdol_vtop_t), &(s->cdol_vcap_t), s->inopcell_m[j]);
 
             }
             else if (abs_r - 2 == i) {
 
-                simp_vector_append(&(s->cdopcelll_f[i]), &(s->cdol_vtop_f[i]), &(s->cdol_vcap_f[i]), -s->inopcell_l[j]);
-                simp_vector_append(&(s->cdopcellr_f[i]), &(s->cdol_vtop_f[i]), &(s->cdol_vcap_f[i]), -s->inopcell_m[j]);
+                simp_vector_append(&(s->cdopcelll_f), &(s->cdol_vtop_f), &(s->cdol_vcap_f), s->inopcell_l[j]);
+                simp_vector_append(&(s->cdopcellr_f), &(s->cdol_vtop_f), &(s->cdol_vcap_f), s->inopcell_m[j]);
 
             }
 
@@ -192,15 +171,11 @@ void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n) {
 
 void SATSolver_destroy(SATSolver* s) {
 
-    for (__int64 i = 0; i < s->n; i++) {
+    delete[] s->cdopcelll_f;
+    delete[] s->cdopcellr_f;
 
-        delete[] s->cdopcelll_f[i];
-        delete[] s->cdopcellr_f[i];
-
-        delete[] s->cdopcelll_t[i];
-        delete[] s->cdopcellr_t[i];
-
-    }
+    delete[] s->cdopcelll_t;
+    delete[] s->cdopcellr_t;
 
     delete[] s->inopcell_l;
     delete[] s->inopcell_m;
@@ -212,18 +187,6 @@ void SATSolver_destroy(SATSolver* s) {
     delete[] s->cdopcelll_t;
     delete[] s->cdopcellr_t;
 
-    delete[] s->cdol_vtop_f;
-    delete[] s->cdol_vcap_f;
-
-    delete[] s->cdol_vtop_t;
-    delete[] s->cdol_vcap_t;
-
-    delete[] s->cdor_vtop_f;
-    delete[] s->cdor_vcap_f;
-
-    delete[] s->cdor_vtop_t;
-    delete[] s->cdor_vcap_t;
-
     delete[] s->inopcell_l;
     delete[] s->inopcell_r;
 
@@ -232,6 +195,9 @@ void SATSolver_destroy(SATSolver* s) {
 
     delete[] s->cdopcelll_t;
     delete[] s->cdopcellr_t;
+
+    delete[] s->varref_f;
+    delete[] s->varref_t;
 
 }
 

@@ -16,23 +16,26 @@ typedef struct SATSolver_tag {
 	__int64* inopcell_m;	// instance operation cell middle
 	__int64* inopcell_r;	// instance operation cell right
 
-	__int64** cdopcelll_f;	// encoding operation cell left, false
-	__int64** cdopcelll_t;	// encoding operation cell left, true
+	__int64* cdopcelll_f;	// encoding operation cell left, false
+	__int64* cdopcelll_t;	// encoding operation cell left, true
 
-	__int64* cdol_vtop_f;	// vector top, left, false
-	__int64* cdol_vcap_f;	// vector capacity, left, false
+	__int64 cdol_vtop_f;	// vector top, left, false
+	__int64 cdol_vcap_f;	// vector capacity, left, false
 
-	__int64* cdol_vtop_t;	// vector top, left, true
-	__int64* cdol_vcap_t;	// vector capacity, left, true
+	__int64 cdol_vtop_t;	// vector top, left, true
+	__int64 cdol_vcap_t;	// vector capacity, left, true
 
-	__int64** cdopcellr_f;	// encoding operation cell right, false
-	__int64** cdopcellr_t;	// encoding operation cell right, true
+	__int64* cdopcellr_f;	// encoding operation cell right, false
+	__int64* cdopcellr_t;	// encoding operation cell right, true
 
-	__int64*  cdor_vtop_f;	// vector top, right, false
-	__int64*  cdor_vcap_f;	// vector capacity, right, false
+	__int64  cdor_vtop_f;	// vector top, right, false
+	__int64  cdor_vcap_f;	// vector capacity, right, false
 
-	__int64* cdor_vtop_t;	// vector top, right, true
-	__int64* cdor_vcap_t;	// vector capacity, right, true
+	__int64 cdor_vtop_t;	// vector top, right, true
+	__int64 cdor_vcap_t;	// vector capacity, right, true
+
+	__int64* varref_f;		// variable reference into false values
+	__int64* varref_t;		// variable reference into true values
 
 } SATSolver;
 
