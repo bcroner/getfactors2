@@ -8,6 +8,10 @@
 
 #include <stdio.h>
 
+#define LVAL 0
+#define MVAL 1
+#define RVAL 2
+
 bool* simp_bool_vector_create(__int64 init_sz) {
 
     bool* ret = new bool[init_sz];
@@ -118,6 +122,13 @@ void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n) {
     s->varref_f = new __int64[n];
     s->varref_t = new __int64[n];
 
+    for (__int64 i = 0; i < n; i++) {
+
+        s->varref_f[i] = 0;
+        s->varref_t[i] = 0;
+
+    }
+
     // place instance variables into encoding
 
     for (__int64 i = 0; i < s->n; i++) {
@@ -127,44 +138,42 @@ void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n) {
             __int64 abs_m = s->inopcell_m[j] < 0 ? -s->inopcell_m[j] : s->inopcell_m[j];
             __int64 abs_r = s->inopcell_r[j] < 0 ? -s->inopcell_r[j] : s->inopcell_r[j];
 
-            if (abs_l - 2 == i && s->inopcell_l[j] < 0) {
+            __int64 loc = -1;
+            __int64 val = 0;
 
-                simp_vector_append(&(s->cdopcelll_t), &(s->cdol_vtop_t), &(s->cdol_vcap_t), s->inopcell_m[j]);
-                simp_vector_append(&(s->cdopcellr_t), &(s->cdol_vtop_t), &(s->cdol_vcap_t), s->inopcell_r[j]);
-
-            }
-            else if (abs_l - 2 == i) {
-
-                simp_vector_append(&(s->cdopcelll_f), &(s->cdol_vtop_f), &(s->cdol_vcap_f), s->inopcell_m[j]);
-                simp_vector_append(&(s->cdopcellr_f), &(s->cdol_vtop_f), &(s->cdol_vcap_f), s->inopcell_r[j]);
-
-            }
-            else if (abs_m - 2 == i && s->inopcell_m[j] < 0) {
-
-                simp_vector_append(&(s->cdopcelll_t), &(s->cdol_vtop_t), &(s->cdol_vcap_t), s->inopcell_l[j]);
-                simp_vector_append(&(s->cdopcellr_t), &(s->cdol_vtop_t), &(s->cdol_vcap_t), s->inopcell_r[j]);
-
+            if (abs_l - 2 == i) {
+                loc = LVAL;
+                val = s->inopcell_l[j];
             }
             else if (abs_m - 2 == i) {
-
-                simp_vector_append(&(s->cdopcelll_f), &(s->cdol_vtop_f), &(s->cdol_vcap_f), s->inopcell_l[j]);
-                simp_vector_append(&(s->cdopcellr_f), &(s->cdol_vtop_f), &(s->cdol_vcap_f), s->inopcell_r[j]);
-
-            }
-            else if (abs_r - 2 == i && s->inopcell_r[j] < 0) {
-
-                simp_vector_append(&(s->cdopcelll_t), &(s->cdol_vtop_t), &(s->cdol_vcap_t), s->inopcell_l[j]);
-                simp_vector_append(&(s->cdopcellr_t), &(s->cdol_vtop_t), &(s->cdol_vcap_t), s->inopcell_m[j]);
-
+                loc = MVAL;
+                val = s->inopcell_m[j];
             }
             else if (abs_r - 2 == i) {
+                loc = RVAL;
+                val = s->inopcell_r[j];
+            }
+            else
+                continue;
 
-                simp_vector_append(&(s->cdopcelll_f), &(s->cdol_vtop_f), &(s->cdol_vcap_f), s->inopcell_l[j]);
-                simp_vector_append(&(s->cdopcellr_f), &(s->cdol_vtop_f), &(s->cdol_vcap_f), s->inopcell_m[j]);
-
+            if (val < 0) {
+                __int64 left_val = loc == LVAL ? abs_m - 2 > i ? s->inopcell_m[j] : s->varref_t[i] : loc == MVAL ? abs_l - 2 > i ? s->inopcell_l[j] : s->varref_t[i] : abs_r - 2 > i ? s->inopcell_l[j] : s->varref_t[i];
+                __int64 right_val = loc == LVAL ? abs_r - 2 > i ? s->inopcell_r[j] : s->varref_t[i] : loc == MVAL ? abs_r - 2 > i ? s->inopcell_r[j] : s->varref_t[i] : abs_m - 2 > i ? s->inopcell_m[j] : s->varref_t[i];
+                simp_vector_append(&(s->cdopcelll_t), &(s->cdol_vtop_t), &(s->cdol_vcap_t), left_val);
+                simp_vector_append(&(s->cdopcellr_t), &(s->cdol_vtop_t), &(s->cdol_vcap_t), right_val);
+            }
+            else {
+                __int64 left_val = loc == LVAL ? abs_m - 2 > i ? s->inopcell_m[j] : s->varref_f[i] : loc == MVAL ? abs_l - 2 > i ? s->inopcell_l[j] : s->varref_f[i] : abs_r - 2 > i ? s->inopcell_l[j] : s->varref_f[i];
+                __int64 right_val = loc == LVAL ? abs_r - 2 > i ? s->inopcell_r[j] : s->varref_f[i] : loc == MVAL ? abs_r - 2 > i ? s->inopcell_r[j] : s->varref_f[i] : abs_m - 2 > i ? s->inopcell_m[j] : s->varref_f[i];
+                simp_vector_append(&(s->cdopcelll_f), &(s->cdol_vtop_f), &(s->cdol_vcap_f), left_val);
+                simp_vector_append(&(s->cdopcellr_f), &(s->cdol_vtop_f), &(s->cdol_vcap_f), right_val);
             }
 
         }
+
+        s->varref_f[i] = s->cdol_vtop_f;
+        s->varref_t[i] = s->cdol_vtop_t;
+
     }
 
 }
