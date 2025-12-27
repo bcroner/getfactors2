@@ -157,14 +157,14 @@ void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n) {
                 continue;
 
             if (val < 0) {
-                __int64 left_val = loc == LVAL ? abs_m - 2 > i ? s->inopcell_m[j] : s->varref_t[i] : loc == MVAL ? abs_l - 2 > i ? s->inopcell_l[j] : s->varref_t[i] : abs_r - 2 > i ? s->inopcell_l[j] : s->varref_t[i];
-                __int64 right_val = loc == LVAL ? abs_r - 2 > i ? s->inopcell_r[j] : s->varref_t[i] : loc == MVAL ? abs_r - 2 > i ? s->inopcell_r[j] : s->varref_t[i] : abs_m - 2 > i ? s->inopcell_m[j] : s->varref_t[i];
+                __int64 left_val = loc == LVAL ? s->inopcell_m[j] : loc == MVAL ? s->inopcell_l[j] : s->inopcell_l[j];
+                __int64 right_val = loc == LVAL ? s->inopcell_r[j] : loc == MVAL ? s->inopcell_r[j] : s->inopcell_m[j];
                 simp_vector_append(&(s->cdopcelll_t), &(s->cdol_vtop_t), &(s->cdol_vcap_t), left_val);
                 simp_vector_append(&(s->cdopcellr_t), &(s->cdol_vtop_t), &(s->cdol_vcap_t), right_val);
             }
             else {
-                __int64 left_val = loc == LVAL ? abs_m - 2 > i ? s->inopcell_m[j] : s->varref_f[i] : loc == MVAL ? abs_l - 2 > i ? s->inopcell_l[j] : s->varref_f[i] : abs_r - 2 > i ? s->inopcell_l[j] : s->varref_f[i];
-                __int64 right_val = loc == LVAL ? abs_r - 2 > i ? s->inopcell_r[j] : s->varref_f[i] : loc == MVAL ? abs_r - 2 > i ? s->inopcell_r[j] : s->varref_f[i] : abs_m - 2 > i ? s->inopcell_m[j] : s->varref_f[i];
+                __int64 left_val = loc == LVAL ? s->inopcell_m[j] : loc == MVAL ? s->inopcell_l[j] : s->inopcell_l[j];
+                __int64 right_val = loc == LVAL ? s->inopcell_r[j] : loc == MVAL ? s->inopcell_r[j] : s->inopcell_m[j];
                 simp_vector_append(&(s->cdopcelll_f), &(s->cdol_vtop_f), &(s->cdol_vcap_f), left_val);
                 simp_vector_append(&(s->cdopcellr_f), &(s->cdol_vtop_f), &(s->cdol_vcap_f), right_val);
             }
