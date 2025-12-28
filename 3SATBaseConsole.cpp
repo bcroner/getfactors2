@@ -99,8 +99,29 @@ bool SATSolver_less_than(__int64 a, __int64 b) {
 
 bool SATSolver_add(SATSolver * me , __int64 cls_ix, bool increment) {
 
+	__int64 top = 0;
+	__int64 abs_top = 0;
+
 	if (increment) {
-		me->Z[0] = !me->Z[0];
+
+		top = 0;
+		abs_top = 0;
+
+		while (abs_top < me->master->n) {
+			if (me->Z[abs_top])
+				me->Z[abs_top] = false;
+			else {
+				me->Z[abs_top] = true;
+				break;
+			}
+			abs_top++;
+		}
+
+		// zero out all lower bits of Z
+
+		for (__int64 j = abs_top - 1; j >= 0; j--)
+			me->Z[j] = false;
+
 		printf_s("inc %-3s ", "");
 	}
 	else {
@@ -126,15 +147,26 @@ bool SATSolver_add(SATSolver * me , __int64 cls_ix, bool increment) {
 
 		__int64 abs_max_abc = max_abc < 0 ? -max_abc - 2 : max_abc - 2;
 
-		me->Z[abs_max_abc] = !me->Z[abs_max_abc];
+		top = abs_max_abc;
+		abs_top = abs_max_abc;
+
+		while (abs_top < me->master->n) {
+			if (me->Z[abs_top])
+				me->Z[abs_top] = false;
+			else {
+				me->Z[abs_top] = true;
+				break;
+			}
+			abs_top++;
+		}
+
+		// zero out all lower bits of Z
+
+		for (__int64 j = abs_top - 1; j >= 0; j--)
+			me->Z[j] = false;
 	}
 
-	bool end = false;
-
-	for (__int64 i = 0; i < me->master->n; i++)
-		end |= !me->Z[i];
-
-	return !end;
+	return abs_top >= me->master->n - me->master->chops;
 }
 
 __int64 SATSolver_initializePowJump(SATSolver* me) {
