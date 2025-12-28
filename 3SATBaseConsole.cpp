@@ -214,13 +214,15 @@ bool check_satisfiability(SATSolverMaster* me, bool* Z) {
 
 }
 
-bool SATSolver_isSat(SATSolver* me, bool* arr) {
+bool SATSolver_isSat(SATSolver* me, __int64 chop, bool* arr) {
 
 	bool jump_occurred = false;
 	bool crossed_boundary = false;
 
+	printf_s("chop: %lld\n", chop);
+
 	for (__int64 i = 0; i < me->master->n; i++)
-		me->Z[i] = false;
+		me->Z[i] = me->master->begin[chop][i];
 
 	if (!true)
 		for (__int64 i = 0; i < me->master->n; i++)

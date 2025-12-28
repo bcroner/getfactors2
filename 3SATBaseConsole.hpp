@@ -43,7 +43,7 @@ bool SATSolver_add(SATSolver* me, __int64 cls_ix);
 __int64 SATSolver_initializePowJump(SATSolver* me);
 bool SATSolver_GreaterThan(bool* a, bool* b, __int64 n);
 bool check_satisfiability(SATSolverMaster* me, bool* Z) {
-bool SATSolver_isSat(SATSolver* me, bool *arr);
+bool SATSolver_isSat(SATSolver* me, __int64 chop, bool *arr);
 bool * SATSolver_bool_pow(bool* base, __int64 pow, __int64 n);
 bool * SATSolver_bool_add(bool *a, bool *b, __int64 n);
 bool * SATSolver_bool_prepare_end(bool* a, bool* b, __int64 n);
