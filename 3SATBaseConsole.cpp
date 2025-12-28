@@ -101,11 +101,11 @@ void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n) {
         s->inopcell_r[i] = lst[i][2];
     }
 
-    s->cdopcelll_f = simp_vector_create(16);
-    s->cdopcellr_f = simp_vector_create(16);
+    s->cdopcelll_f = simp_vector_create(n + 16);
+    s->cdopcellr_f = simp_vector_create(n + 16);
 
-    s->cdopcelll_t = simp_vector_create(16);
-    s->cdopcellr_t = simp_vector_create(16);
+    s->cdopcelll_t = simp_vector_create(n + 16);
+    s->cdopcellr_t = simp_vector_create(n + 16);
 
     s->cdol_vtop_f = 0;
     s->cdol_vcap_f = 0;
@@ -129,9 +129,18 @@ void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n) {
 
     }
 
+    // create space for variables in encoding operational cells
+
+    for (__int64 i = 0; i < n; i++) {
+        simp_vector_append(&(s->cdopcelll_f), &(s->cdol_vtop_f), &(s->cdol_vcap_f), i);
+        simp_vector_append(&(s->cdopcellr_f), &(s->cdor_vtop_f), &(s->cdor_vcap_f), i);
+        simp_vector_append(&(s->cdopcelll_t), &(s->cdol_vtop_t), &(s->cdol_vcap_t), i);
+        simp_vector_append(&(s->cdopcellr_t), &(s->cdor_vtop_t), &(s->cdor_vcap_t), i);
+    }
+
     // place instance variables into encoding
 
-    for (__int64 i = 0; i < s->n; i++) {
+    for (__int64 i = 0; i < n; i++) {
         for (__int64 j = 0; j < s->k; i++) {
 
             __int64 abs_l = s->inopcell_l[j] < 0 ? -s->inopcell_l[j] : s->inopcell_l[j];
