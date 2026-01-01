@@ -13,7 +13,6 @@ typedef struct SATSolver_tag {
 	__int64 k;
 
 	bool* Z;				// current state of advancement through search space
-	bool* end;				// end of current search space
 
 	__int64* inopcell_l;	// instance operation cell left
 	__int64* inopcell_m;	// instance operation cell middle

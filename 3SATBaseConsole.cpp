@@ -114,7 +114,6 @@ void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n, __int64
     s->n = n;
 
     s->Z = SATSolver_create_boundary(true, chops, chop, n);
-    s->end = SATSolver_create_boundary(false, chops, chop, n);
 
     s->inopcell_l = new __int64 [k];
     s->inopcell_m = new __int64 [k];
