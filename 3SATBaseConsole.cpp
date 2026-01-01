@@ -641,6 +641,9 @@ bool SATSolver_isSat(SATSolver* s, __int64 chops, bool* sln) {
                 }
             }
         }
+
+        if (ix >= s->n - chops)
+            break;
     }
 
     delete[] is_t;
