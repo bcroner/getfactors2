@@ -275,6 +275,8 @@ bool bool_equals(bool* A, bool* B, __int64 n) {
 
 bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n_parm, bool* is_f_parm, bool* is_t_parm) {
 
+    bool is_sat = false;
+
     __int64 counter = 2;
 
     __int64* encoding = new __int64[n_parm];
@@ -476,9 +478,7 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
 
         if (!contradiction && ix == 0) {
 
-            // clean up
-
-            return true;
+            is_sat = true;
 
         }
         else if (!contradiction)
@@ -495,7 +495,38 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
 
     // clean up
 
-    return false;
+    delete[] encoding;
+
+    delete[] used;
+
+    delete[] is_f;
+    delete[] is_t;
+
+    for (__int64 i = 0; i < n; i++) {
+
+        delete[] false_implies[i];
+        delete[] true_implies[i];
+    }
+
+    delete[] false_implies;
+    delete[] true_implies;
+
+    delete[] false_implies_sz;
+    delete[] true_implies_sz;
+
+    delete[] lst_l;
+    delete[] lst_r;
+
+    delete[] true_implies_counter;
+    delete[] false_implies_counter;
+
+    delete[] Z;
+    delete[] end;
+
+    delete[] falses;
+    delete[] trues;
+
+    return is_sat;
 }
 
 bool SATSolver_isSat(SATSolver* s, __int64 chops, bool* sln) {
