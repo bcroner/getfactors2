@@ -175,7 +175,7 @@ void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n, __int64
 
     // place instance variables into encoding
 
-    for (__int64 i = 0; i < n; i++) {
+    for (__int64 i = 2; i < n; i++) {
 
         s->cd_sizes_f[i] = 0;
         s->cd_sizes_t[i] = 0;
@@ -275,11 +275,11 @@ bool bool_equals(bool* A, bool* B, __int64 n) {
 
 bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n_parm, bool* is_f_parm, bool* is_t_parm) {
 
-    __int64 counter = 0;
+    __int64 counter = 2;
 
-    __int64* encoding = new __int64[n];
+    __int64* encoding = new __int64[n_parm];
 
-    for (__int64 i = 0; i < n_parm; i++) {
+    for (__int64 i = 2; i < n_parm; i++) {
         if (is_f_parm[i]) {
             encoding[counter] = i;
             counter++;
@@ -304,13 +304,13 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
         used[r_abs] = true;
     }
 
-    __int64 n = 0;
+    __int64 n = 2;
 
-    for (__int64 i = 0; i < n_parm; i++)
+    for (__int64 i = 2; i < n_parm; i++)
         if (used[i])
             n++;
 
-    for (__int64 i = 0; i < n; i++) {
+    for (__int64 i = 2; i < n; i++) {
         if (used[i]) {
             encoding[counter] = i;
             counter++;
@@ -325,7 +325,7 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
         is_t[i] = false;
     }
 
-    for (__int64 i = 0; i < n; i++) {
+    for (__int64 i = 2; i < n; i++) {
         if (is_f_parm[encoding[i]])
             is_f[i] = true;
         if (is_t_parm[encoding[i]])
@@ -349,6 +349,18 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
             is_t[encoding[val_abs]] = true;
     }
 
+    __int64** false_implies = new __int64* [n];
+    __int64** true_implies = new __int64* [n];
+
+    __int64* false_implies_sz = new __int64[n];
+    __int64* true_implies_sz = new __int64[n];
+
+    for (__int64 i = 0; i < n; i++) {
+
+        false_implies_sz[i] = 0;
+        true_implies_sz[i] = 0;
+    }
+
     __int64* lst_l = new __int64[k];
     __int64* lst_r = new __int64[k];
 
@@ -367,6 +379,123 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
         }
     }
 
+    for (__int64 i = 0; i < k; i++) {
+
+        __int64 l_abs = lst_l[i] < 0 ? -lst_l[i] : lst_l[i];
+        __int64 r_abs = lst_r[i] < 0 ? -lst_r[i] : lst_r[i];
+
+        if (lst_l[i] < 0)
+            true_implies_sz[i]++;
+        else
+            false_implies_sz[i]++;
+
+        if (lst_r[i] < 0)
+            true_implies_sz[i]++;
+        else
+            false_implies_sz[i]++;
+    }
+
+    __int64* true_implies_counter = new __int64[n];
+    __int64* false_implies_counter = new __int64[n];
+
+    for (__int64 i = 0; i < n; i++) {
+        true_implies_counter = 0;
+        false_implies_counter = 0;
+    }
+
+    for (__int64 i = 0; i < k; i++) {
+
+        __int64 l_abs = lst_l[i] < 0 ? -lst_l[i] : lst_l[i];
+        __int64 r_abs = lst_r[i] < 0 ? -lst_r[i] : lst_r[i];
+
+        if (lst_l[i] < 0) {
+            true_implies[i][true_implies_counter[i]] = lst_r[i];
+            true_implies_counter[i]++;
+        }
+        else {
+            false_implies[i][false_implies_counter[i]] = lst_r[i];
+            false_implies_counter[i]++;
+        }
+        if (lst_r[i] < 0) {
+            true_implies[i][true_implies_counter[i]] = lst_l[i];
+            true_implies_counter[i]++;
+        }
+        else {
+            false_implies[i][false_implies_counter[i]] = lst_l[i];
+            false_implies_counter[i]++;
+        }
+    }
+
+    bool* Z = new bool[n];
+    bool* end = new bool[n];
+
+    for (__int64 i = 0; i < n; i++) {
+
+        Z[i] = false;
+        end[i] = true;
+    }
+
+    bool* falses = new bool[n];
+    bool* trues = new bool[n];
+
+    __int64 ix = n - 1;
+
+    while (!bool_equals(Z, end, n)) {
+
+        for (__int64 i = 0; i < n; i++) {
+            falses[i] = false;
+            trues[i] = false;
+        }
+        
+        for (__int64 i = 0; i < n; i++) {
+
+            if (is_f[i])
+                falses[i] = true;
+
+            if (is_t[i])
+                trues[i] = true;
+
+        }
+
+        for (__int64 i = 0; i < n; i++) {
+            if (Z[i])
+                for (__int64 j = 0; j < true_implies_sz[i]; j++)
+                    trues[true_implies[i][j]] = true;
+            else
+                for (__int64 j = 0; j < false_implies_sz[i]; j++)
+                    falses[false_implies[i][j]] = true;
+        }
+
+        bool contradiction = false;
+
+        for (__int64 i = 0; i < n; i++)
+            if (trues[i] && falses[i]) {
+                contradiction = true;
+                break;
+            }
+
+        if (!contradiction && ix == 0) {
+
+            // clean up
+
+            return true;
+
+        }
+        else if (!contradiction)
+            ix--;
+        else if (Z[ix]) {
+            for (__int64 i = ix; i >= 0; i--)
+                Z[i] = false;
+            ix++;
+        }
+        else {
+            Z[ix] = true;
+        }
+    }
+
+    // clean up
+
+    return false;
 }
 
 bool SATSolver_isSat(SATSolver* s, __int64 chops, bool* sln) {
