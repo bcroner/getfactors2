@@ -83,15 +83,40 @@ void simp_vector_append(__int64** v, __int64* vtop, __int64* vcap, __int64 data)
 
 }
 
-void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n) {
+bool* SATSolver_create_boundary(bool begin, __int64 chop, __int64 offs, __int64 n) {
+
+    bool* ret = new bool[n];
+
+    for (__int64 i = 0; i < chop; i++) {
+
+        __int64 pow2 = 1;
+        for (__int64 j = chop - 1 - i; j > 0; j--)
+            pow2 *= 2;
+
+        if (offs >= pow2) {
+            ret[n - 1 - i] = true;
+            offs -= pow2;
+        }
+        else
+            ret[n - 1 - i] = false;
+    }
+
+    for (__int64 i = chop; i < n; i++)
+        ret[n - 1 - i] = begin ? false : true;
+
+    return ret;
+
+}
+
+void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n, __int64 chops, __int64 chop) {
 
     s->k = k;
     s->n = n;
+    s->chops = chops;
+    s->chop = chop;
 
-    s->Z = new bool[n];
-
-    for (__int64 i = 0; i < n; i++)
-        s->Z = false;
+    s->Z = SATSolver_create_boundary(true, chops, chop, n);
+    s->end = SATSolver_create_boundary(false, chops, chop, n);
 
     s->inopcell_l = new __int64 [k];
     s->inopcell_m = new __int64 [k];
@@ -106,41 +131,44 @@ void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n) {
         s->inopcell_r[i] = lst[i][2];
     }
 
-    s->cdopcelll_f = simp_vector_create(n + 16);
-    s->cdopcellr_f = simp_vector_create(n + 16);
+    s->cdopcelll_f = new __int64* [n];
+    s->cdopcellr_f = new __int64* [n];
 
-    s->cdopcelll_t = simp_vector_create(n + 16);
-    s->cdopcellr_t = simp_vector_create(n + 16);
+    s->cdol_vtop_f = new __int64[n];
+    s->cdol_vcap_f = new __int64[n];
 
-    s->cdol_vtop_f = 0;
-    s->cdol_vcap_f = 0;
+    s->cdor_vtop_f = new __int64[n];
+    s->cdor_vcap_f = new __int64[n];
 
-    s->cdol_vtop_t = 0;
-    s->cdol_vcap_t = 0;
+    s->cdopcelll_t = new __int64* [n];
+    s->cdopcellr_t = new __int64* [n];
 
-    s->cdor_vtop_f = 0;
-    s->cdor_vcap_f = 0;
+    s->cdol_vtop_t = new __int64[n];
+    s->cdol_vcap_t = new __int64[n];
 
-    s->cdor_vtop_t = 0;
-    s->cdor_vcap_t = 0;
+    s->cdor_vtop_t = new __int64[n];
+    s->cdor_vcap_t = new __int64[n];
 
-    s->varref_f = new __int64[n];
-    s->varref_t = new __int64[n];
 
     for (__int64 i = 0; i < n; i++) {
 
-        s->varref_f[i] = 0;
-        s->varref_t[i] = 0;
+        s->cdopcelll_f[i] = simp_vector_create(16);
+        s->cdopcellr_f[i] = simp_vector_create(16);
 
-    }
+        s->cdol_vtop_f[i] = -1;
+        s->cdol_vcap_f[i] = 16;
 
-    // create space for variables in encoding operational cells
+        s->cdor_vtop_f[i] = -1;
+        s->cdor_vcap_f[i] = 16;
 
-    for (__int64 i = 0; i < n; i++) {
-        simp_vector_append(&(s->cdopcelll_f), &(s->cdol_vtop_f), &(s->cdol_vcap_f), i);
-        simp_vector_append(&(s->cdopcellr_f), &(s->cdor_vtop_f), &(s->cdor_vcap_f), i);
-        simp_vector_append(&(s->cdopcelll_t), &(s->cdol_vtop_t), &(s->cdol_vcap_t), i);
-        simp_vector_append(&(s->cdopcellr_t), &(s->cdor_vtop_t), &(s->cdor_vcap_t), i);
+        s->cdopcelll_t[i] = simp_vector_create(16);
+        s->cdopcellr_t[i] = simp_vector_create(16);
+
+        s->cdol_vtop_t[i] = -1;
+        s->cdol_vcap_t[i] = 16;
+
+        s->cdor_vtop_t[i] = -1;
+        s->cdor_vcap_t[i] = 16;
     }
 
     // place instance variables into encoding
@@ -173,20 +201,17 @@ void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n) {
             if (val < 0) {
                 __int64 left_val = loc == LVAL ? s->inopcell_m[j] : loc == MVAL ? s->inopcell_l[j] : s->inopcell_l[j];
                 __int64 right_val = loc == LVAL ? s->inopcell_r[j] : loc == MVAL ? s->inopcell_r[j] : s->inopcell_m[j];
-                simp_vector_append(&(s->cdopcelll_t), &(s->cdol_vtop_t), &(s->cdol_vcap_t), left_val);
-                simp_vector_append(&(s->cdopcellr_t), &(s->cdol_vtop_t), &(s->cdol_vcap_t), right_val);
+                simp_vector_append(&(s->cdopcelll_t[i]), &(s->cdol_vtop_t[i]), &(s->cdol_vcap_t[i]), left_val);
+                simp_vector_append(&(s->cdopcellr_t[i]), &(s->cdol_vtop_t[i]), &(s->cdol_vcap_t[i]), right_val);
             }
             else {
                 __int64 left_val = loc == LVAL ? s->inopcell_m[j] : loc == MVAL ? s->inopcell_l[j] : s->inopcell_l[j];
                 __int64 right_val = loc == LVAL ? s->inopcell_r[j] : loc == MVAL ? s->inopcell_r[j] : s->inopcell_m[j];
-                simp_vector_append(&(s->cdopcelll_f), &(s->cdol_vtop_f), &(s->cdol_vcap_f), left_val);
-                simp_vector_append(&(s->cdopcellr_f), &(s->cdol_vtop_f), &(s->cdol_vcap_f), right_val);
+                simp_vector_append(&(s->cdopcelll_f[i]), &(s->cdol_vtop_f[i]), &(s->cdol_vcap_f[i]), left_val);
+                simp_vector_append(&(s->cdopcellr_f[i]), &(s->cdol_vtop_f[i]), &(s->cdol_vcap_f[i]), right_val);
             }
 
         }
-
-        s->varref_f[i] = s->cdol_vtop_f;
-        s->varref_t[i] = s->cdol_vtop_t;
 
     }
 
@@ -196,37 +221,39 @@ void SATSolver_destroy(SATSolver* s) {
 
     delete[] s->Z;
 
-    delete[] s->cdopcelll_f;
-    delete[] s->cdopcellr_f;
+    for (__int64 i = 0; i < n; i++) {
+
+        delete[] s->cdopcelll_f[i];
+        delete[] s->cdopcellr_f[i];
+
+        delete[] s->cdopcelll_t[i];
+        delete[] s->cdopcellr_t[i];
+
+    }
 
     delete[] s->cdopcelll_t;
     delete[] s->cdopcellr_t;
 
-    delete[] s->inopcell_l;
-    delete[] s->inopcell_m;
-    delete[] s->inopcell_r;
+    delete[] s->cdopcelll_t;
+    delete[] s->cdopcellr_t;
 
     delete[] s->cdopcelll_f;
     delete[] s->cdopcellr_f;
 
-    delete[] s->cdopcelll_t;
-    delete[] s->cdopcellr_t;
+    delete[] s->cdol_vtop_f;
+    delete[] s->cdol_vcap_f;
 
-    delete[] s->inopcell_l;
-    delete[] s->inopcell_r;
+    delete[] s->cdor_vtop_f;
+    delete[] s->cdor_vcap_f;
 
-    delete[] s->cdopcelll_f;
-    delete[] s->cdopcellr_f;
+    delete[] s->cdol_vtop_t;
+    delete[] s->cdol_vcap_t;
 
-    delete[] s->cdopcelll_t;
-    delete[] s->cdopcellr_t;
-
-    delete[] s->varref_f;
-    delete[] s->varref_t;
-
+    delete[] s->cdor_vtop_t;
+    delete[] s->cdor_vcap_t;
 }
 
-bool SATSolver_isSat(SATSolver* s, bool* sln) {
+bool SATSolver_isSat(SATSolver* s, __int64 chop, bool* sln) {
 
     return true;
 }
