@@ -273,11 +273,141 @@ bool bool_equals(bool* A, bool* B, __int64 n) {
     return true;
 }
 
-bool two_sat(__int64* lst_l, __int64* lst_r, __int64 k, __int64 n_parm) {
+bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n_parm, bool* is_f_parm, bool* is_t_parm) {
+
+    __int64 counter = 0;
+
+    __int64* encoding = new __int64[n];
+
+    for (__int64 i = 0; i < n_parm; i++) {
+        if (is_f_parm[i]) {
+            encoding[counter] = i;
+            counter++;
+        }
+        if (is_t_parm[i]) {
+            encoding[counter] = i;
+            counter++;
+        }
+    }
+
+    bool* used = new bool[n_parm];
+
+    for (__int64 i = 0; i < n_parm; i++)
+        used[i] = false;
+
+    for (__int64 i = 0; i < k_parm; i++) {
+
+        __int64 l_abs = lst_l_parm[i] < 0 ? -lst_l_parm[i] : lst_l_parm[i];
+        __int64 r_abs = lst_r_parm[i] < 0 ? -lst_r_parm[i] : lst_r_parm[i];
+
+        used[l_abs] = true;
+        used[r_abs] = true;
+    }
+
+    __int64 n = 0;
+
+    for (__int64 i = 0; i < n_parm; i++)
+        if (used[i])
+            n++;
+
+    for (__int64 i = 0; i < n; i++) {
+        if (used[i]) {
+            encoding[counter] = i;
+            counter++;
+        }
+    }
+
+    __int64* is_f = new __int64[n];
+    __int64* is_t = new __int64[n];
+
+    for (__int64 i = 0; i < n; i++) {
+        is_f[i] = false;
+        is_t[i] = false;
+    }
+
+    for (__int64 i = 0; i < n; i++) {
+        if (is_f_parm[encoding[i]])
+            is_f[i] = true;
+        if (is_t_parm[encoding[i]])
+            is_t[i] = true;
+    }
+
+    __int64 k = 0;
+
+    for (__int64 i = 0; i < k_parm; i++) {
+        if (lst_l_parm[i] != FALSE_3SAT && lst_r_parm[i] != FALSE_3SAT) {
+            k++;
+            continue;
+        }
+
+        __int64 val = lst_l_parm[i] == FALSE_3SAT ? lst_r_parm[i] : lst_l_parm[i];
+        __int64 val_abs = val < 0 ? -val : val;
+
+        if (val < 0)
+            is_f[encoding[val_abs]] = true;
+        else
+            is_t[encoding[val_abs]] = true;
+    }
+
+    __int64* lst_l = new __int64[k];
+    __int64* lst_r = new __int64[k];
+
+    __int64 counter_k = 0;
+
+    for (__int64 i = 0; i < k_parm; i++) {
+        if (lst_l_parm[i] != FALSE_3SAT && lst_r_parm[i] != FALSE_3SAT) {
+
+            __int64 l_abs = lst_l_parm[i] < 0 ? -lst_l_parm[i] : lst_l_parm[i];
+            __int64 r_abs = lst_r_parm[i] < 0 ? -lst_r_parm[i] : lst_r_parm[i];
+
+            lst_l[counter_k] = lst_l_parm[i] < 0 ? -encoding[l_abs] : encoding[l_abs];
+            lst_r[counter_k] = lst_r_parm[i] < 0 ? -encoding[r_abs] : encoding[r_abs];
+
+            counter_k++;
+        }
+    }
 
 }
 
 bool SATSolver_isSat(SATSolver* s, __int64 chops, bool* sln) {
+
+    bool* is_f = new bool[s->n];
+    bool* is_t = new bool[s->n];
+
+    for (__int64 i = 0; i < s->n; i++) {
+        is_f[i] = false;
+        is_t[i] = false;
+    }
+
+    for (__int64 i = 0; i < s->k; i++) {
+        __int64 count_f = 0;
+        if (s->inopcell_l[i] == FALSE_3SAT)
+            count_f++;
+        if (s->inopcell_m[i] == FALSE_3SAT)
+            count_f++;
+        if (s->inopcell_r[i] == FALSE_3SAT)
+            count_f++;
+
+        if (count_f < 2)
+            continue;
+
+        __int64 val = 0;
+
+        if (s->inopcell_l[i] != FALSE_3SAT)
+            val = s->inopcell_l[i];
+        else if (s->inopcell_m[i] != FALSE_3SAT)
+            val = s->inopcell_m[i];
+        else
+            val = s->inopcell_r[i];
+
+        __int64 val_abs = val < 0 ? -val : val;
+
+        if (val < 0)
+            is_f[val_abs] = true;
+        else
+            is_t[val_abs] = true;
+
+    }
 
     __int64 ix = s->n - 1 - chops;
 
@@ -313,7 +443,7 @@ bool SATSolver_isSat(SATSolver* s, __int64 chops, bool* sln) {
             }
         }
 
-        bool is_2sat_sat = two_sat(cd_2sat_l, cd_2sat_r, cd_2sat_cur_sz_f + cd_2sat_cur_sz_t, s->n);
+        bool is_2sat_sat = two_sat(cd_2sat_l, cd_2sat_r, cd_2sat_cur_sz_f + cd_2sat_cur_sz_t, s->n, is_f, is_t);
 
         if (is_2sat_sat && ix == 0) {
 

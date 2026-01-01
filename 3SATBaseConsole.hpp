@@ -52,7 +52,7 @@ bool* SATSolver_create_boundary(bool begin, __int64 chop, __int64 offs, __int64 
 void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n, __int64 chops, __int64 chop);
 void SATSolver_destroy(SATSolver* s);
 bool bool_equals(bool* A, bool* B, __int64 n);
-bool two_sat(__int64* lst_l, __int64* lst_r, __int64 k, __int64 n_parm);
+bool two_sat(__int64* lst_l_parm, __int64* lst_parm, __int64 k_parm, __int64 n_parm, bool* is_f_parm, bool* is_t_parm);
 bool SATSolver_isSat(SATSolver* s, __int64 chops, bool* sln);
 
 #endif
