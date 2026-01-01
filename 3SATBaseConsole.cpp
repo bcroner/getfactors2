@@ -442,7 +442,7 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
 
     __int64 ix = n - 1;
 
-    while (!bool_equals(Z, end, n)) {
+    while (true) {
 
         for (__int64 i = 0; i < n; i++) {
             falses[i] = false;
@@ -483,14 +483,24 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
         }
         else if (!contradiction)
             ix--;
-        else if (Z[ix]) {
-            for (__int64 i = ix; i >= 0; i--)
-                Z[i] = false;
-            ix++;
-        }
         else {
-            Z[ix] = true;
+            for (__int64 i = ix - 1; i >= 0; i--)
+                Z[i] = false;
+            while (ix < n) {
+                if (!Z[ix]) {
+                    Z[ix] = true;
+                    break;
+                }
+                else {
+                    Z[ix] = false;
+                    ix++;
+                }
+            }
         }
+
+        if (ix == n)
+            break;
+
     }
 
     // clean up
@@ -571,7 +581,9 @@ bool SATSolver_isSat(SATSolver* s, __int64 chops, bool* sln) {
 
     __int64 ix = s->n - 1 - chops;
 
-    while (!bool_equals(s->Z, s->end, s->n)) {
+    bool is_sat = false;
+
+    while (true) {
 
         __int64 size_2sat = 0;
 
@@ -610,22 +622,31 @@ bool SATSolver_isSat(SATSolver* s, __int64 chops, bool* sln) {
             for (__int64 i = 0; i < s->n; i++)
                 sln[i] = s->Z[i];
 
-            return true;
+            is_sat = true;
 
         }
         else if (is_2sat_sat)
             ix--;
-        else if (s->Z[ix]) {
-            for (__int64 i = ix; i >= 0; i--)
-                s->Z[i] = false;
-            ix++;
-        }
         else {
-            s->Z[ix] = true;
+            for (__int64 i = ix - 1; i >= 0; i--)
+                s->Z[i] = false;
+            while (ix < s->n - chops) {
+                if (!s->Z[ix]) {
+                    s->Z[ix] = true;
+                    break;
+                }
+                else {
+                    s->Z[ix] = false;
+                    ix++;
+                }
+            }
         }
     }
 
-    return false;
+    delete[] is_t;
+    delete[] is_f;
+
+    return is_sat;
 }
 
 #endif
