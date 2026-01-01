@@ -11,8 +11,6 @@ typedef struct SATSolver_tag {
 
 	__int64 n;
 	__int64 k;
-	__int64 chops;
-	__int64 chop;
 
 	bool* Z;				// current state of advancement through search space
 	bool* end;				// end of current search space
@@ -39,6 +37,9 @@ typedef struct SATSolver_tag {
 	__int64* cdor_vtop_t;	// vector top, right, true
 	__int64* cdor_vcap_t;	// vector capacity, right, true
 
+	__int64* cd_sizes_f;	// sizes of encodings, false
+	__int64* cd_sizes_t;	// sizes of encodings, true
+
 } SATSolver;
 
 bool* simp_bool_vector_create(__int64 init_sz);
@@ -50,6 +51,8 @@ void simp_vector_append(__int64** v, __int64* vtop, __int64* vcap, __int64 data)
 bool* SATSolver_create_boundary(bool begin, __int64 chop, __int64 offs, __int64 n);
 void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n, __int64 chops, __int64 chop);
 void SATSolver_destroy(SATSolver* s);
-bool SATSolver_isSat(SATSolver* s, __int64 chop, bool* sln);
+bool bool_equals(bool* A, bool* B, __int64 n);
+bool two_sat(__int64* lst_l, __int64* lst_r, __int64 k, __int64 n_parm);
+bool SATSolver_isSat(SATSolver* s, __int64 chops, bool* sln);
 
 #endif

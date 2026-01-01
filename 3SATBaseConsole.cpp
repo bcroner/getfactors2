@@ -112,8 +112,6 @@ void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n, __int64
 
     s->k = k;
     s->n = n;
-    s->chops = chops;
-    s->chop = chop;
 
     s->Z = SATSolver_create_boundary(true, chops, chop, n);
     s->end = SATSolver_create_boundary(false, chops, chop, n);
@@ -149,6 +147,10 @@ void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n, __int64
     s->cdor_vtop_t = new __int64[n];
     s->cdor_vcap_t = new __int64[n];
 
+    s->cd_sizes_f = new __int64[n];
+    s->cd_sizes_t = new __int64[n];
+
+
 
     for (__int64 i = 0; i < n; i++) {
 
@@ -174,6 +176,10 @@ void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n, __int64
     // place instance variables into encoding
 
     for (__int64 i = 0; i < n; i++) {
+
+        s->cd_sizes_f[i] = 0;
+        s->cd_sizes_t[i] = 0;
+
         for (__int64 j = 0; j < s->k; i++) {
 
             __int64 abs_l = s->inopcell_l[j] < 0 ? -s->inopcell_l[j] : s->inopcell_l[j];
@@ -203,12 +209,14 @@ void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n, __int64
                 __int64 right_val = loc == LVAL ? s->inopcell_r[j] : loc == MVAL ? s->inopcell_r[j] : s->inopcell_m[j];
                 simp_vector_append(&(s->cdopcelll_t[i]), &(s->cdol_vtop_t[i]), &(s->cdol_vcap_t[i]), left_val);
                 simp_vector_append(&(s->cdopcellr_t[i]), &(s->cdol_vtop_t[i]), &(s->cdol_vcap_t[i]), right_val);
+                s->cd_sizes_t[i]++;
             }
             else {
                 __int64 left_val = loc == LVAL ? s->inopcell_m[j] : loc == MVAL ? s->inopcell_l[j] : s->inopcell_l[j];
                 __int64 right_val = loc == LVAL ? s->inopcell_r[j] : loc == MVAL ? s->inopcell_r[j] : s->inopcell_m[j];
                 simp_vector_append(&(s->cdopcelll_f[i]), &(s->cdol_vtop_f[i]), &(s->cdol_vcap_f[i]), left_val);
                 simp_vector_append(&(s->cdopcellr_f[i]), &(s->cdol_vtop_f[i]), &(s->cdol_vcap_f[i]), right_val);
+                s->cd_sizes_f[i]++;
             }
 
         }
@@ -251,11 +259,83 @@ void SATSolver_destroy(SATSolver* s) {
 
     delete[] s->cdor_vtop_t;
     delete[] s->cdor_vcap_t;
+
+    delete[] s->cd_sizes_f;
+    delete[] s->cd_sizes_t;
 }
 
-bool SATSolver_isSat(SATSolver* s, __int64 chop, bool* sln) {
+bool bool_equals(bool* A, bool* B, __int64 n) {
+
+    for (__int64 i = 0; i < n; i++)
+        if (A[i] != B[i])
+            return false;
 
     return true;
+}
+
+bool two_sat(__int64* lst_l, __int64* lst_r, __int64 k, __int64 n_parm) {
+
+}
+
+bool SATSolver_isSat(SATSolver* s, __int64 chops, bool* sln) {
+
+    __int64 ix = s->n - 1 - chops;
+
+    while (!bool_equals(s->Z, s->end, s->n)) {
+
+        __int64 size_2sat = 0;
+
+        for (__int64 i = s->n - 1; i >= ix; i--)
+            if (s->Z[i])
+                size_2sat += s->cd_sizes_f[i];
+            else
+                size_2sat += s->cd_sizes_t[i];
+
+        __int64* cd_2sat_l = new __int64[size_2sat];
+        __int64* cd_2sat_r = new __int64[size_2sat];
+        __int64 cd_2sat_cur_sz_f = 0;
+        __int64 cd_2sat_cur_sz_t = 0;
+
+        for (__int64 i = s->n - 1; i >= ix; i--) {
+            if (s->Z[i]) {
+                for (__int64 j = 0; j < s->cd_sizes_f[i]; j++) {
+                    cd_2sat_l[cd_2sat_cur_sz_f + j] = s->cdopcelll_f[i][j];
+                    cd_2sat_r[cd_2sat_cur_sz_f + j] = s->cdopcellr_f[i][j];
+                }
+                cd_2sat_cur_sz_f += s->cd_sizes_f[i];
+            }
+            else {
+                for (__int64 j = 0; j < s->cd_sizes_t[i]; j++) {
+                    cd_2sat_l[cd_2sat_cur_sz_t + j] = s->cdopcelll_t[i][j];
+                    cd_2sat_r[cd_2sat_cur_sz_t + j] = s->cdopcellr_t[i][j];
+                }
+                cd_2sat_cur_sz_t += s->cd_sizes_t[i];
+            }
+        }
+
+        bool is_2sat_sat = two_sat(cd_2sat_l, cd_2sat_r, cd_2sat_cur_sz_f + cd_2sat_cur_sz_t, s->n);
+
+        if (is_2sat_sat && ix == 0) {
+
+            for (__int64 i = 0; i < s->n; i++)
+                sln[i] = s->Z[i];
+
+            return true;
+
+        }
+        else if (is_2sat_sat)
+            ix--;
+        else if (s->Z[ix]) {
+            for (__int64 i = ix; i >= 0; i--)
+                s->Z[i] = false;
+            ix++;
+        }
+        else {
+            s->Z[ix] = true;
+        }
+    }
+
+    return false;
 }
 
 #endif
