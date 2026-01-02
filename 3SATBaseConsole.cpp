@@ -475,7 +475,7 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
                 break;
             }
 
-        if (!contradiction && ix == 0) {
+        if (!contradiction && ix == 2) {
 
             is_sat = true;
 
@@ -616,7 +616,7 @@ bool SATSolver_isSat(SATSolver* s, __int64 chops, bool* sln) {
 
         bool is_2sat_sat = two_sat(cd_2sat_l, cd_2sat_r, cd_2sat_cur_sz_f + cd_2sat_cur_sz_t, s->n, is_f, is_t);
 
-        if (is_2sat_sat && ix == 0) {
+        if (is_2sat_sat && ix == 2) {
 
             for (__int64 i = 0; i < s->n; i++)
                 sln[i] = s->Z[i];
