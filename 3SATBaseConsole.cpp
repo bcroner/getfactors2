@@ -469,7 +469,7 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
 
         bool contradiction = false;
 
-        for (__int64 i = 0; i < n; i++)
+        for (__int64 i = 2; i < n; i++)
             if (trues[i] && falses[i]) {
                 contradiction = true;
                 break;
