@@ -478,6 +478,7 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
         if (!contradiction && ix == 2) {
 
             is_sat = true;
+            break;
 
         }
         else if (!contradiction)
