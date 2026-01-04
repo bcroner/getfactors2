@@ -624,6 +624,8 @@ bool SATSolver_isSat(SATSolver* s, __int64 chops, bool* sln) {
 
             is_sat = true;
 
+            break;
+
         }
         else if (is_2sat_sat)
             ix--;
