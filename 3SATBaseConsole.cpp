@@ -458,7 +458,7 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
 
         }
 
-        for (__int64 i = 0; i < n; i++) {
+        for (__int64 i = 2; i < n; i++) {
             if (Z[i])
                 for (__int64 j = 0; j < true_implies_sz[i]; j++)
                     trues[true_implies[i][j]] = true;
