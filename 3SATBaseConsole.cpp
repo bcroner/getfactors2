@@ -39,12 +39,11 @@ void simp_bool_vector_append(bool** v, __int64* vtop, __int64* vcap, bool data) 
             newv[i] = 0;
         for (__int64 i = 0; i < *vcap; i++)
             newv[i] = *v[i];
-        *vcap *= 2;
+        *vcap = *vcap * 2;
         delete[] * v;
         *v = newv;
         *v[*vtop] = data;
     }
-
 }
 
 
@@ -75,7 +74,7 @@ void simp_vector_append(__int64** v, __int64* vtop, __int64* vcap, __int64 data)
             newv[i] = 0;
         for (__int64 i = 0; i < *vcap; i++)
             newv[i] = *v[i];
-        *vcap *= 2;
+        *vcap = *vcap * 2;
         delete[] * v;
         *v = newv;
         *v[*vtop] = data;
@@ -149,8 +148,6 @@ void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n, __int64
     s->cd_sizes_f = new __int64[n];
     s->cd_sizes_t = new __int64[n];
 
-
-
     for (__int64 i = 0; i < n; i++) {
 
         s->cdopcelll_f[i] = simp_vector_create(16);
@@ -176,50 +173,69 @@ void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n, __int64
 
     for (__int64 i = 2; i < n; i++) {
 
+        printf_s("i: %lld\n", i);
+
         s->cd_sizes_f[i] = 0;
         s->cd_sizes_t[i] = 0;
 
         for (__int64 j = 0; j < s->k; j++) {
 
+            printf_s("%lld ", j);
+
             __int64 abs_l = s->inopcell_l[j] < 0 ? -s->inopcell_l[j] : s->inopcell_l[j];
             __int64 abs_m = s->inopcell_m[j] < 0 ? -s->inopcell_m[j] : s->inopcell_m[j];
             __int64 abs_r = s->inopcell_r[j] < 0 ? -s->inopcell_r[j] : s->inopcell_r[j];
 
+            __int64 count = 0;
+
+            if (abs_l == 1)
+                count++;
+            if (abs_m == 1)
+                count++;
+            if (abs_r == 1)
+                count++;
+
+            if (count == 2)
+                continue;
+
             __int64 loc = -1;
             __int64 val = 0;
 
-            if (abs_l - 2 == i) {
+            if (abs_l == i) {
                 loc = LVAL;
                 val = s->inopcell_l[j];
             }
-            else if (abs_m - 2 == i) {
+            else if (abs_m == i) {
                 loc = MVAL;
                 val = s->inopcell_m[j];
             }
-            else if (abs_r - 2 == i) {
+            else if (abs_r == i) {
                 loc = RVAL;
                 val = s->inopcell_r[j];
             }
             else
                 continue;
 
+            if (i == 47 && j == 109)
+                printf_s("");
+
             if (val < 0) {
                 __int64 left_val = loc == LVAL ? s->inopcell_m[j] : loc == MVAL ? s->inopcell_l[j] : s->inopcell_l[j];
                 __int64 right_val = loc == LVAL ? s->inopcell_r[j] : loc == MVAL ? s->inopcell_r[j] : s->inopcell_m[j];
                 simp_vector_append(&(s->cdopcelll_t[i]), &(s->cdol_vtop_t[i]), &(s->cdol_vcap_t[i]), left_val);
-                simp_vector_append(&(s->cdopcellr_t[i]), &(s->cdol_vtop_t[i]), &(s->cdol_vcap_t[i]), right_val);
+                simp_vector_append(&(s->cdopcellr_t[i]), &(s->cdor_vtop_t[i]), &(s->cdor_vcap_t[i]), right_val);
                 s->cd_sizes_t[i]++;
             }
             else {
                 __int64 left_val = loc == LVAL ? s->inopcell_m[j] : loc == MVAL ? s->inopcell_l[j] : s->inopcell_l[j];
                 __int64 right_val = loc == LVAL ? s->inopcell_r[j] : loc == MVAL ? s->inopcell_r[j] : s->inopcell_m[j];
                 simp_vector_append(&(s->cdopcelll_f[i]), &(s->cdol_vtop_f[i]), &(s->cdol_vcap_f[i]), left_val);
-                simp_vector_append(&(s->cdopcellr_f[i]), &(s->cdol_vtop_f[i]), &(s->cdol_vcap_f[i]), right_val);
+                simp_vector_append(&(s->cdopcellr_f[i]), &(s->cdor_vtop_f[i]), &(s->cdor_vcap_f[i]), right_val);
                 s->cd_sizes_f[i]++;
             }
 
         }
-
+        printf_s("\n");
     }
 
 }
