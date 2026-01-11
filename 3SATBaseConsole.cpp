@@ -32,7 +32,7 @@ void simp_bool_vector_append(bool** v, __int64* vtop, __int64* vcap, bool data) 
     *vtop = *vtop + 1;
 
     if (*vtop < *vcap)
-        *v[*vtop] = data;
+        (*v)[*vtop] = data;
     else {
         bool* newv = new bool[*vcap * 2];
         for (__int64 i = 0; i < *vcap * 2; i++)
@@ -67,7 +67,7 @@ void simp_vector_append(__int64** v, __int64* vtop, __int64* vcap, __int64 data)
     *vtop = *vtop + 1;
 
     if (*vtop < *vcap)
-        *v[*vtop] = data;
+        (*v)[*vtop] = data;
     else {
         __int64* newv = new __int64[*vcap * 2];
         for (__int64 i = 0; i < *vcap * 2; i++)
@@ -121,6 +121,8 @@ void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n, __int64
     // copy instance into SATSolver vectors
 
     for (__int64 i = 0; i < k; i++) {
+
+        printf_s("%lld: %lld %lld %lld\n", i, lst[i][0], lst[i][1], lst[i][2]);
 
         s->inopcell_l[i] = lst[i][0];
         s->inopcell_m[i] = lst[i][1];
@@ -216,7 +218,7 @@ void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n, __int64
             else
                 continue;
 
-            if (i == 47 && j == 109)
+            if (i == 47 && j == 107)
                 printf_s("");
 
             if (val < 0) {
