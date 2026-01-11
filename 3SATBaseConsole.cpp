@@ -228,7 +228,7 @@ void SATSolver_destroy(SATSolver* s) {
 
     delete[] s->Z;
 
-    for (__int64 i = 0; i < n; i++) {
+    for (__int64 i = 0; i < s->n; i++) {
 
         delete[] s->cdopcelll_f[i];
         delete[] s->cdopcellr_f[i];
