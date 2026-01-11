@@ -218,9 +218,6 @@ void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n, __int64
             else
                 continue;
 
-            if (i == 47 && j == 107)
-                printf_s("");
-
             if (val < 0) {
                 __int64 left_val = loc == LVAL ? s->inopcell_m[j] : loc == MVAL ? s->inopcell_l[j] : s->inopcell_l[j];
                 __int64 right_val = loc == LVAL ? s->inopcell_r[j] : loc == MVAL ? s->inopcell_r[j] : s->inopcell_m[j];
