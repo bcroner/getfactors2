@@ -506,11 +506,21 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
 
         for (__int64 i = 2; i < n; i++) {
             if (Z[i])
-                for (__int64 j = 0; j < true_implies_sz[i]; j++)
-                    trues[true_implies[i][j]] = true;
+                for (__int64 j = 0; j < true_implies_sz[i]; j++) {
+                    __int64 val_abs = true_implies[i][j] < 0 ? - true_implies[i][j] : true_implies[i][j];
+                    if (true_implies[i][j] < 0)
+                        falses[val_abs] = true;
+                    else
+                        trues[val_abs] = true;
+                }
             else
-                for (__int64 j = 0; j < false_implies_sz[i]; j++)
-                    falses[false_implies[i][j]] = true;
+                for (__int64 j = 0; j < false_implies_sz[i]; j++) {
+                    __int64 val_abs = false_implies[i][j] < 0 ? -false_implies[i][j] : false_implies[i][j];
+                    if (false_implies[i][j] < 0)
+                        falses[val_abs] = true;
+                    else
+                        trues[val_abs] = true;
+                }
         }
 
         bool contradiction = false;
