@@ -346,7 +346,7 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
     for (__int64 i = 2; i < n_parm; i++) {
         if (used[i] && ! is_f_parm[i] && ! is_t_parm[i]) {
             encoding[i] = counter;
-            //decoding[counter] = i;
+            decoding[counter] = i;
             counter++;
         }
     }
@@ -659,15 +659,15 @@ bool SATSolver_isSat(SATSolver* s, __int64 chops, bool* sln) {
         for (__int64 i = s->n - 1; i >= ix; i--) {
             if (s->Z[i]) {
                 for (__int64 j = 0; j < s->cd_sizes_f[i]; j++) {
-                    cd_2sat_l[cd_2sat_cur_sz_f + j] = s->cdopcelll_f[i][j];
-                    cd_2sat_r[cd_2sat_cur_sz_f + j] = s->cdopcellr_f[i][j];
+                    cd_2sat_l[cd_2sat_cur_sz_f + cd_2sat_cur_sz_t + j] = s->cdopcelll_f[i][j];
+                    cd_2sat_r[cd_2sat_cur_sz_f + cd_2sat_cur_sz_t + j] = s->cdopcellr_f[i][j];
                 }
                 cd_2sat_cur_sz_f += s->cd_sizes_f[i];
             }
             else {
                 for (__int64 j = 0; j < s->cd_sizes_t[i]; j++) {
-                    cd_2sat_l[cd_2sat_cur_sz_t + j] = s->cdopcelll_t[i][j];
-                    cd_2sat_r[cd_2sat_cur_sz_t + j] = s->cdopcellr_t[i][j];
+                    cd_2sat_l[cd_2sat_cur_sz_f + cd_2sat_cur_sz_t + j] = s->cdopcelll_t[i][j];
+                    cd_2sat_r[cd_2sat_cur_sz_f + cd_2sat_cur_sz_t + j] = s->cdopcellr_t[i][j];
                 }
                 cd_2sat_cur_sz_t += s->cd_sizes_t[i];
             }
