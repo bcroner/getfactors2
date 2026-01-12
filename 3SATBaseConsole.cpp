@@ -346,7 +346,7 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
     for (__int64 i = 2; i < n_parm; i++) {
         if (used[i] && ! is_f_parm[i] && ! is_t_parm[i]) {
             encoding[i] = counter;
-            decoding[counter] = i;
+            //decoding[counter] = i;
             counter++;
         }
     }
@@ -424,14 +424,26 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
         __int64 r_abs = lst_r[i] < 0 ? -lst_r[i] : lst_r[i];
 
         if (lst_l[i] < 0)
-            true_implies_sz[i]++;
+            true_implies_sz[l_abs]++;
         else
-            false_implies_sz[i]++;
+            false_implies_sz[l_abs]++;
 
         if (lst_r[i] < 0)
-            true_implies_sz[i]++;
+            true_implies_sz[r_abs]++;
         else
-            false_implies_sz[i]++;
+            false_implies_sz[r_abs]++;
+    }
+
+    for (__int64 i = 0; i < n; i++) {
+        true_implies[i] = new __int64[true_implies_sz[i]];
+        false_implies[i] = new __int64[false_implies_sz[i]];
+    }
+
+    for (__int64 i = 0; i < n; i++) {
+        for (__int64 j = 0; j < true_implies_sz[i]; j++)
+            true_implies[i][j] = 0;
+        for (__int64 j = 0; j < false_implies_sz[i]; j++)
+            false_implies[i][j] = 0;
     }
 
     __int64* true_implies_counter = new __int64[n];
@@ -448,31 +460,27 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
         __int64 r_abs = lst_r[i] < 0 ? -lst_r[i] : lst_r[i];
 
         if (lst_l[i] < 0) {
-            true_implies[i][true_implies_counter[i]] = lst_r[i];
-            true_implies_counter[i]++;
+            true_implies[l_abs][true_implies_counter[l_abs]] = lst_r[i];
+            true_implies_counter[l_abs]++;
         }
         else {
-            false_implies[i][false_implies_counter[i]] = lst_r[i];
-            false_implies_counter[i]++;
+            false_implies[l_abs][false_implies_counter[l_abs]] = lst_r[i];
+            false_implies_counter[l_abs]++;
         }
         if (lst_r[i] < 0) {
-            true_implies[i][true_implies_counter[i]] = lst_l[i];
-            true_implies_counter[i]++;
+            true_implies[r_abs][true_implies_counter[r_abs]] = lst_l[i];
+            true_implies_counter[r_abs]++;
         }
         else {
-            false_implies[i][false_implies_counter[i]] = lst_l[i];
-            false_implies_counter[i]++;
+            false_implies[r_abs][false_implies_counter[r_abs]] = lst_l[i];
+            false_implies_counter[r_abs]++;
         }
     }
 
     bool* Z = new bool[n];
-    bool* end = new bool[n];
 
-    for (__int64 i = 0; i < n; i++) {
-
+    for (__int64 i = 0; i < n; i++)
         Z[i] = false;
-        end[i] = true;
-    }
 
     bool* falses = new bool[n];
     bool* trues = new bool[n];
@@ -544,6 +552,7 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
     // clean up
 
     delete[] encoding;
+    delete[] decoding;
 
     delete[] used;
 
@@ -569,7 +578,6 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
     delete[] false_implies_counter;
 
     delete[] Z;
-    delete[] end;
 
     delete[] falses;
     delete[] trues;
