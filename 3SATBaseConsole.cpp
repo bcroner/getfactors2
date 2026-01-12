@@ -256,9 +256,6 @@ void SATSolver_destroy(SATSolver* s) {
     delete[] s->cdopcelll_t;
     delete[] s->cdopcellr_t;
 
-    delete[] s->cdopcelll_t;
-    delete[] s->cdopcellr_t;
-
     delete[] s->cdopcelll_f;
     delete[] s->cdopcellr_f;
 
