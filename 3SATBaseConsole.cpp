@@ -450,8 +450,8 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
     __int64* false_implies_counter = new __int64[n];
 
     for (__int64 i = 0; i < n; i++) {
-        true_implies_counter = 0;
-        false_implies_counter = 0;
+        true_implies_counter[i] = 0;
+        false_implies_counter[i] = 0;
     }
 
     for (__int64 i = 0; i < k; i++) {
