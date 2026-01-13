@@ -1977,7 +1977,7 @@ char* nat_to_str(bool* decodable_buf, nat_3sat* a, __int64* str_sz) {
         else if (a->bits[i]->id == FALSE_3SAT)
             bool_buf[i] = false;
         else
-            bool_buf[i] = decodable_buf[a->bits[i]->id - 2];
+            bool_buf[i] = decodable_buf[a->bits[i]->id];
 
     __int64 first_nonzero = 0;
     for (first_nonzero = 0; first_nonzero < a->sz && ! bool_buf[first_nonzero]; first_nonzero++)
@@ -2281,7 +2281,7 @@ char* nat_get_factors(char* c_str, __int64 c_str_buf_sz, __int64 * len_para) {
 
     __int64 k = 0;
     __int64** input = input_from_char_buf(buf_3sat, buf_3sat_sz, &k, false);
-    bool* sln = new bool[num_para - 1];
+    bool* sln = new bool[num_para];
 
     /*
 
