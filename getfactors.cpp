@@ -104,7 +104,7 @@ char* nat_test_add(__int64 * len_para) {
         __int64 k = 0;
         __int64** input = input_from_char_buf(buf_3sat, buf_3sat_sz, &k, false);
 
-        for (__int64 i = 0; i < k + 1; i++)
+        for (__int64 i = 0; i < k; i++)
             printf_s("%lld: %lld %lld %lld\n", i, input[i][0], input[i][1], input[i][2]);
         printf_s("\n");
 
@@ -118,7 +118,7 @@ char* nat_test_add(__int64 * len_para) {
         bool is_sat = false;
 
         SATSolver* s = new SATSolver();
-        SATSolver_create(s, input, k + 1, num_para + 1, 0, 0);
+        SATSolver_create(s, input, k, num_para + 1, 0, 0);
 
         is_sat = SATSolver_isSat(s, sln);
 
@@ -245,7 +245,7 @@ char* nat_test_mul(__int64 * len_para) {
         __int64 k = 0;
         __int64** input = input_from_char_buf(buf_3sat, buf_3sat_sz, &k, false);
 
-        for (__int64 i = 0; i < k + 1; i++)
+        for (__int64 i = 0; i < k; i++)
             printf_s("%lld: %lld %lld %lld\n", i, input[i][0], input[i][1], input[i][2]);
         printf_s("\n");
 
@@ -260,7 +260,7 @@ char* nat_test_mul(__int64 * len_para) {
         bool is_sat = false;
 
         SATSolver* s = new SATSolver();
-        SATSolver_create(s, input, k + 1, num_para + 1, 0, 0);
+        SATSolver_create(s, input, k, num_para + 1, 0, 0);
 
         is_sat = SATSolver_isSat(s, sln);
 
@@ -380,7 +380,7 @@ char* nat_test_equals(__int64 * len_para) {
     __int64** input = input_from_char_buf(buf_3sat, buf_3sat_sz, &k, false);
     bool* sln = new bool[num_para + 1];
 
-    for (__int64 i = 0; i < k + 1; i++)
+    for (__int64 i = 0; i < k; i++)
         printf_s("%lld: %lld %lld %lld\n", i, input[i][0], input[i][1], input[i][2]);
     printf_s("\n");
 
@@ -394,7 +394,7 @@ char* nat_test_equals(__int64 * len_para) {
     bool is_sat = false;
 
     SATSolver* s = new SATSolver();
-    SATSolver_create(s, input, k + 1, num_para + 1, 0, 0);
+    SATSolver_create(s, input, k, num_para + 1, 0, 0);
 
     is_sat = SATSolver_isSat(s, sln);
 
