@@ -2241,10 +2241,8 @@ char* nat_get_factors(char* c_str, __int64 c_str_buf_sz, __int64 * len_para) {
 
     // transfer over inbuffer
 
-    for (__int64 i = 0; i < c_bit_count * 2; i++) {
-        c_equals->bits[i] = new bit_3sat();
+    for (__int64 i = 0; i < c_bit_count * 2; i++)
         c_equals->bits[i]->id = inbuffer[leading_zeros + i] ? TRUE_3SAT : FALSE_3SAT;
-    }
 
     delete[] inbuffer;
 
