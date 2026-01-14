@@ -1849,9 +1849,9 @@ __int64** input_from_char_buf(char * buf_3sat, __int64 buf_3sat_sz, __int64 * k,
 
         if ((cnf || (!cnf && a != TRUE_3SAT && b != TRUE_3SAT && c != TRUE_3SAT)) &&
             a != -b && a != -c && b != -c) {
-            ret[iter][0] = !cnf ? a : a < 0 ? a - 1 : a + 1;
-            ret[iter][1] = !cnf ? b : b < 0 ? b - 1 : b + 1;
-            ret[iter][2] = !cnf ? c : c < 0 ? c - 1 : c + 1;
+            ret[iter][0] = a;
+            ret[iter][1] = b;
+            ret[iter][2] = c;
             iter++;
         }
         pos++;
