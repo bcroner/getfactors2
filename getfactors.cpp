@@ -252,7 +252,7 @@ char* nat_test_mul(__int64 * len_para) {
         bool is_sat = false;
 
         SATSolver* s = new SATSolver();
-        SATSolver_create(s, input, k, num_para + 1, 0, 0);
+        SATSolver_create(s, input, k + 1, num_para + 1, 0, 0);
 
         is_sat = SATSolver_isSat(s, 0, sln);
 
@@ -386,7 +386,7 @@ char* nat_test_equals(__int64 * len_para) {
     bool is_sat = false;
 
     SATSolver* s = new SATSolver();
-    SATSolver_create(s, input, k, num_para + 1, 0, 0);
+    SATSolver_create(s, input, k + 1, num_para + 1, 0, 0);
 
     is_sat = SATSolver_isSat(s, 0, sln);
 

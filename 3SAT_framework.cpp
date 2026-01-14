@@ -2173,7 +2173,7 @@ char* dec_get_factors(char* c_str, __int64 c_str_buf_sz, __int64 * len_para) {
     bool is_sat = false;
 
     SATSolver* s = new SATSolver();
-    SATSolver_create(s, input, k, num_para + 1, 0, 0);
+    SATSolver_create(s, input, k + 1, num_para + 1, 0, 0);
 
     is_sat = SATSolver_isSat(s, 0, sln);
 
@@ -2329,7 +2329,7 @@ char* nat_get_factors(char* c_str, __int64 c_str_buf_sz, __int64 * len_para) {
     bool is_sat = false;
 
     SATSolver* s = new SATSolver();
-    SATSolver_create(s, input, k, num_para + 1, 0, 0);
+    SATSolver_create(s, input, k + 1, num_para + 1, 0, 0);
 
     is_sat = SATSolver_isSat(s, 0, sln);
         
