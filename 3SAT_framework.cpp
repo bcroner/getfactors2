@@ -2122,29 +2122,29 @@ char* dec_get_factors(char* c_str, __int64 c_str_buf_sz, __int64 * len_para) {
     a->sz = c_bit_count;
     a->ad_sz = 0;
     a->bd_sz = c_bit_count;
-    a->bits = new bit_3sat * [c_bit_count];
+    a->bits = new bit_3sat * [c_bit_count - 1];
 
     dec_3sat* b = new dec_3sat();
     b->sz = c_bit_count;
     b->ad_sz = 0;
     b->bd_sz = c_bit_count;
-    b->bits = new bit_3sat * [c_bit_count];
+    b->bits = new bit_3sat * [c_bit_count - 1];
 
     a->bits[0] = new bit_3sat();
     a->bits[0]->id = FALSE_3SAT;
 
-    for (__int64 i = 1; i < c_bit_count; i++)
+    for (__int64 i = 0; i < c_bit_count - 1; i++)
         a->bits[i] = create_bit(&num_para);
 
     b->bits[0] = new bit_3sat();
     b->bits[0]->id = FALSE_3SAT;
 
-    for (__int64 i = 1; i < c_bit_count; i++)
+    for (__int64 i = 0; i < c_bit_count - 1; i++)
         b->bits[i] = create_bit(&num_para);
 
     __int64 mul_str_len = 0;
 
-    char* mul_str = dec_mul(&num_para, &c, a, b, c_bit_count * 2, (__int64) 0, & mul_str_len);
+    char* mul_str = dec_mul(&num_para, &c, a, b, (c_bit_count - 1) * 2, (__int64) 0, & mul_str_len);
 
     __int64 equals_str_len = 0;
 
@@ -2173,7 +2173,7 @@ char* dec_get_factors(char* c_str, __int64 c_str_buf_sz, __int64 * len_para) {
     bool is_sat = false;
 
     SATSolver* s = new SATSolver();
-    SATSolver_create(s, input, k, num_para, 0, 0);
+    SATSolver_create(s, input, k, num_para + 1, 0, 0);
 
     is_sat = SATSolver_isSat(s, 0, sln);
 
@@ -2258,10 +2258,10 @@ char* nat_get_factors(char* c_str, __int64 c_str_buf_sz, __int64 * len_para) {
     b->sz = c_bit_count - 1;
     b->bits = new bit_3sat * [c_bit_count - 1];
 
-    for (__int64 i = 0; i < c_bit_count - 1; i++) {
+    for (__int64 i = 0; i < c_bit_count - 1; i++)
         a->bits[i] = create_bit(&num_para);
+    for (__int64 i = 0; i < c_bit_count - 1; i++)
         b->bits[i] = create_bit(&num_para);
-    }
 
     __int64 mul_str_len = 0;
 
@@ -2329,7 +2329,7 @@ char* nat_get_factors(char* c_str, __int64 c_str_buf_sz, __int64 * len_para) {
     bool is_sat = false;
 
     SATSolver* s = new SATSolver();
-    SATSolver_create(s, input, k, num_para, 0, 0);
+    SATSolver_create(s, input, k, num_para + 1, 0, 0);
 
     is_sat = SATSolver_isSat(s, 0, sln);
         
