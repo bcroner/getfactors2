@@ -112,6 +112,8 @@ void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n, __int64
     s->k = k;
     s->n = n;
 
+    s->chops = chops;
+
     s->Z = SATSolver_create_boundary(true, chops, chop, n);
 
     s->inopcell_l = new __int64 [k];
@@ -585,7 +587,7 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
     return is_sat;
 }
 
-bool SATSolver_isSat(SATSolver* s, __int64 chops, bool* sln) {
+bool SATSolver_isSat(SATSolver* s, bool* sln) {
 
     bool* is_f = new bool[s->n];
     bool* is_t = new bool[s->n];
@@ -625,7 +627,7 @@ bool SATSolver_isSat(SATSolver* s, __int64 chops, bool* sln) {
 
     }
 
-    __int64 ix = s->n - 1 - chops;
+    __int64 ix = s->n - 1 - s->chops;
 
     bool is_sat = false;
 
@@ -681,7 +683,7 @@ bool SATSolver_isSat(SATSolver* s, __int64 chops, bool* sln) {
         else {
             for (__int64 i = ix - 1; i >= 0; i--)
                 s->Z[i] = false;
-            while (ix < s->n - chops) {
+            while (ix < s->n - s->chops) {
                 if (!s->Z[ix]) {
                     s->Z[ix] = true;
                     break;
@@ -693,7 +695,7 @@ bool SATSolver_isSat(SATSolver* s, __int64 chops, bool* sln) {
             }
         }
 
-        if (ix >= s->n - chops)
+        if (ix >= s->n - s->chops)
             break;
     }
 

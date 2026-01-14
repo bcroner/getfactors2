@@ -12,6 +12,8 @@ typedef struct SATSolver_tag {
 	__int64 n;
 	__int64 k;
 
+	__int64 chops;
+
 	bool* Z;				// current state of advancement through search space
 
 	__int64* inopcell_l;	// instance operation cell left
@@ -52,6 +54,6 @@ void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n, __int64
 void SATSolver_destroy(SATSolver* s);
 bool bool_equals(bool* A, bool* B, __int64 n);
 bool two_sat(__int64* lst_l_parm, __int64* lst_parm, __int64 k_parm, __int64 n_parm, bool* is_f_parm, bool* is_t_parm);
-bool SATSolver_isSat(SATSolver* s, __int64 chops, bool* sln);
+bool SATSolver_isSat(SATSolver* s, bool* sln);
 
 #endif
