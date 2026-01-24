@@ -160,7 +160,7 @@ char* nat_test_add(__int64 * len_para) {
 char* nat_test_mul(__int64 * len_para) {
 
     const char* a_str_c = "3";
-    const char* b_str_c = "3";
+    const char* b_str_c = "5";
 
     char a_str[2000];
     char b_str[2000];
@@ -302,8 +302,8 @@ char* nat_test_mul(__int64 * len_para) {
 char* nat_test_equals(__int64 * len_para) {
 
 
-    const char* a_str_c = "5";
-    const char* b_str_c = "5";
+    const char* a_str_c = "0";
+    const char* b_str_c = "F";
 
     char a_str[2000];
     char b_str[2000];
@@ -336,9 +336,15 @@ char* nat_test_equals(__int64 * len_para) {
     for (aleading_zeros = 0; !ainbuffer[aleading_zeros]; aleading_zeros++)
         ;
 
+    if (aleading_zeros == ainbuffer_sz)
+        aleading_zeros--;
+
     int bleading_zeros = 0;
     for (bleading_zeros = 0; !binbuffer[bleading_zeros]; bleading_zeros++)
         ;
+
+    if (bleading_zeros == binbuffer_sz)
+        bleading_zeros--;
 
     int a_bit_count = ainbuffer_sz - aleading_zeros;
     int b_bit_count = binbuffer_sz - bleading_zeros;
