@@ -640,7 +640,7 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
 
     __int64 ix = s->n - 1 - s->chops;
 
-    for (__int64 i = s->n - 1; i >= ix; i--)
+    for (__int64 i = s->n - 1; i > ix; i--)
         if ((s->Z[i] && always_f[i]) || (!s->Z[i] && always_t[i])) {
             delete[] always_f;
             delete[] always_t;
