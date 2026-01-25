@@ -110,7 +110,7 @@ char* nat_test_add(__int64 * len_para) {
 
         delete[] buf_3sat;
 
-        sln = new bool[num_para + 1];
+        sln = new bool[num_para];
 
         char* prime_str = new char[8];
         sprintf_s(prime_str, 8, "prime");
@@ -118,7 +118,7 @@ char* nat_test_add(__int64 * len_para) {
         bool is_sat = false;
 
         SATSolver* s = new SATSolver();
-        SATSolver_create(s, input, k, num_para + 1, 0, 0);
+        SATSolver_create(s, input, k, num_para, 0, 0);
 
         is_sat = SATSolver_isSat(s, sln);
 
@@ -251,7 +251,7 @@ char* nat_test_mul(__int64 * len_para) {
 
         delete[] buf_3sat;
 
-        sln = new bool[num_para + 1];
+        sln = new bool[num_para];
 
         char* prime_str = new char[8];
         sprintf_s(prime_str, 8, "prime");
@@ -260,7 +260,7 @@ char* nat_test_mul(__int64 * len_para) {
         bool is_sat = false;
 
         SATSolver* s = new SATSolver();
-        SATSolver_create(s, input, k, num_para + 1, 0, 0);
+        SATSolver_create(s, input, k, num_para, 0, 0);
 
         is_sat = SATSolver_isSat(s, sln);
 
@@ -384,7 +384,7 @@ char* nat_test_equals(__int64 * len_para) {
 
     __int64 k = 0;
     __int64** input = input_from_char_buf(buf_3sat, buf_3sat_sz, &k, false);
-    bool* sln = new bool[num_para + 1];
+    bool* sln = new bool[num_para];
 
     for (__int64 i = 0; i < k; i++)
         printf_s("%lld: %lld %lld %lld\n", i, input[i][0], input[i][1], input[i][2]);
@@ -400,7 +400,7 @@ char* nat_test_equals(__int64 * len_para) {
     bool is_sat = false;
 
     SATSolver* s = new SATSolver();
-    SATSolver_create(s, input, k, num_para + 1, 0, 0);
+    SATSolver_create(s, input, k, num_para, 0, 0);
 
     is_sat = SATSolver_isSat(s, sln);
 

@@ -2177,7 +2177,7 @@ char* dec_get_factors(char* c_str, __int64 c_str_buf_sz, __int64 * len_para) {
 
     __int64 k = 0;
     __int64** input = input_from_char_buf(buf_3sat, buf_3sat_sz, &k, false);
-    bool* sln = new bool[num_para-1];
+    bool* sln = new bool[num_para];
 
     delete[] buf_3sat;
 
@@ -2187,7 +2187,7 @@ char* dec_get_factors(char* c_str, __int64 c_str_buf_sz, __int64 * len_para) {
     bool is_sat = false;
 
     SATSolver* s = new SATSolver();
-    SATSolver_create(s, input, k, num_para + 1, 0, 0);
+    SATSolver_create(s, input, k, num_para, 0, 0);
 
     is_sat = SATSolver_isSat(s, sln);
 
@@ -2344,7 +2344,7 @@ char* nat_get_factors(char* c_str, __int64 c_str_buf_sz, __int64 * len_para) {
     bool is_sat = false;
 
     SATSolver* s = new SATSolver();
-    SATSolver_create(s, input, k, num_para + 1, 0, 0);
+    SATSolver_create(s, input, k, num_para, 0, 0);
 
     is_sat = SATSolver_isSat(s, sln);
         
