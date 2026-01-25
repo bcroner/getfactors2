@@ -304,11 +304,6 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
             decoding[counter] = i;
             counter++;
         }
-        else if (is_f_parm[i] && is_t_parm[i]) {
-            encoding[i] = counter;
-            decoding[counter] = i;
-            counter++;
-        }
     }
 
     bool* used = new bool[n_parm];
