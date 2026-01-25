@@ -87,7 +87,7 @@ char* and_3sat(__int64* num_para, bit_3sat** c, bit_3sat* a, bit_3sat* b, __int6
     for (__int64 i = 0; i < 3; i++) {
         sprintf_s(&(ret[len]), ret_len - len, "%s\n", lst[i]);
         len += (__int64)strnlen_s(lst[i], 64) + (__int64)strnlen_s("\n", 2);
-        delete lst[i];
+        delete [] lst[i];
     }
 
     *len_para = len;
@@ -136,7 +136,7 @@ char* nand_3sat(__int64* num_para, bit_3sat** c, bit_3sat* a, bit_3sat* b, __int
     for (__int64 i = 0; i < 3; i++) {
         sprintf_s(&ret[len], ret_len - len, "%s\n", lst[i]);
         len += (__int64)strnlen_s(lst[i], 64) + (__int64)strnlen_s("\n", 2);
-        delete lst[i];
+        delete [] lst[i];
     }
 
     *len_para = len;
@@ -185,7 +185,7 @@ char* or_3sat(__int64* num_para, bit_3sat** c, bit_3sat* a, bit_3sat* b, __int64
     for (__int64 i = 0; i < 3; i++) {
         sprintf_s(&ret[len], ret_len - len, "%s\n", lst[i]);
         len += (__int64)strnlen_s(lst[i], 64) + (__int64)strnlen_s("\n", 2);
-        delete lst[i];
+        delete [] lst[i];
     }
 
     *len_para = len;
@@ -234,7 +234,7 @@ char* nor_3sat(__int64* num_para, bit_3sat** c, bit_3sat* a, bit_3sat* b, __int6
     for (__int64 i = 0; i < 3; i++) {
         sprintf_s(&(ret[len]), ret_len - len, "%s\n", lst[i]);
         len += (__int64)strnlen_s(lst[i], 64) + (__int64)strnlen_s("\n", 2);
-        delete lst[i];
+        delete [] lst[i];
     }
 
     *len_para = len;
@@ -279,7 +279,7 @@ char* not_3sat(__int64* num_para, bit_3sat** c, bit_3sat* a, __int64* len_para) 
     for (__int64 i = 0; i < 2; i++) {
         sprintf_s(&ret[len], ret_len - len, "%s\n", lst[i]);
         len += (__int64)strnlen_s(lst[i], 64) + (__int64)strnlen_s("\n", 2);
-        delete lst[i];
+        delete [] lst[i];
     }
 
     *len_para = len;
@@ -530,15 +530,21 @@ char* implies_3sat(__int64* num_para, bit_3sat** c, bit_3sat* a, bit_3sat* b, __
 
     char* ret = new char[ret_len];
 
-    strcpy_s(&(ret[pos]), ret_len - pos, not_a_str);
-    pos += not_len;
-    strcpy_s(&(ret[pos]), ret_len - pos, or_str);
-    pos += or_len;
+    if (not_len > 0) {
+        strcpy_s(&(ret[pos]), ret_len - pos, not_a_str);
+        pos += not_len;
+    }
+    if (or_len > 0) {
+        strcpy_s(&(ret[pos]), ret_len - pos, or_str);
+        pos += or_len;
+    }
 
-    *len_para = pos;
+    *len_para = ret_len;
 
-    delete not_a_str;
-    delete or_str;
+    if (not_a_str != NULL)
+        delete [] not_a_str;
+    if (or_str != NULL)
+        delete [] or_str;
 
     return ret;
 
@@ -659,8 +665,10 @@ char* dec_add(__int64 * num_para, dec_3sat** c, dec_3sat* a, dec_3sat* b, bool d
     delete c_in;
     c_in = c_out;
 
-    delete [] sum_str;
-    delete [] c_out_str;
+    if (sum_str != NULL)
+        delete [] sum_str;
+    if (c_out_str != NULL)
+        delete [] c_out_str;
 
     // perform all the rest of the additions
 
@@ -678,8 +686,10 @@ char* dec_add(__int64 * num_para, dec_3sat** c, dec_3sat* a, dec_3sat* b, bool d
         delete c_in;
         c_in = c_out;
 
-        delete [] sum_str;
-        delete [] c_out_str;
+        if (sum_str != NULL)
+            delete [] sum_str;
+        if (c_out_str != NULL)
+            delete [] c_out_str;
     }
 
     // set the msb of c as the final carry_out value
@@ -726,10 +736,14 @@ char* dec_add(__int64 * num_para, dec_3sat** c, dec_3sat* a, dec_3sat* b, bool d
         if ( cout_strs [i] != NULL)
             delete [] cout_strs[i];
     }
-    delete [] sum_strs;
-    delete [] cout_strs;
-    delete [] sum_str_len;
-    delete [] cout_str_len;
+    if (sum_strs != NULL)
+        delete [] sum_strs;
+    if (cout_strs != NULL)
+        delete [] cout_strs;
+    if (sum_str_len != NULL)
+        delete [] sum_str_len;
+    if (cout_str_len != NULL)
+        delete [] cout_str_len;
 
     // return the buffer of 3-CNF
 
@@ -1577,7 +1591,7 @@ char* nat_mul(__int64 * num_para, nat_3sat** c, nat_3sat* a, nat_3sat* b, __int6
     for (__int64 i = 0; i < b->sz; i++) {
         for (__int64 j = 0; j < a->sz; j++)
             if (and_str_itmd_ab[i][j] > 0)
-                delete and_strs[i][j];
+                delete [] and_strs[i][j];
         delete [] and_strs[i];
     }
     for (__int64 i = 1; i < b->sz; i++)
@@ -1586,7 +1600,7 @@ char* nat_mul(__int64 * num_para, nat_3sat** c, nat_3sat* a, nat_3sat* b, __int6
     delete [] sum_strs;
     delete [] and_strs;
     for (__int64 i = 0; i < b->sz; i++)
-        delete and_str_itmd_ab[i];
+        delete [] and_str_itmd_ab[i];
     delete [] and_str_itmd_ab;
     delete [] sum_str_len;
 
