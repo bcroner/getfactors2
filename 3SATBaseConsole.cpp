@@ -644,14 +644,30 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
             return false;
         }
 
+    for (__int64 i = 0; i < s->n; i++)
+        if (always_f[i]) {
+            is_f[i] = true;
+            is_t[i] = false;
+        }
+        else if (always_t[i]) {
+            is_f[i] = false;
+            is_t[i] = true;
+        }
+
+    for (__int64 i = s->n - 1; i >= ix; i--)
+        if (!always_f[i] && s->Z[i]) {
+            is_t[i] = true;
+            is_f[i] = false;
+        }
+        else if (!always_t[i] && !s->Z[i]) {
+            is_t[i] = false;
+            is_f[i] = true;
+
+        }
+
     bool is_sat = false;
 
     while (true) {
-
-        for (__int64 i = s->n - 1; i >= 0; i--) {
-            is_f[i] = false;
-            is_t[i] = false;
-        }
 
         __int64 size_2sat = 0;
 
@@ -683,27 +699,6 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
             }
         }
 
-        for (__int64 i = 0; i < s->n; i++)
-            if (always_f[i]) {
-                is_f[i] = true;
-                is_t[i] = false;
-            }
-            else if (always_t[i]) {
-                is_f[i] = false;
-                is_t[i] = true;
-            }
-
-        for (__int64 i = s->n - 1; i >= ix; i--)
-            if (! always_f[i] && s->Z[i]) {
-                is_t[i] = true;
-                is_f[i] = false;
-            }
-            else if (! always_t[i] && !s->Z[i]) {
-                is_t[i] = false;
-                is_f[i] = true;
-
-            }
-
         bool is_2sat_sat = two_sat(cd_2sat_l, cd_2sat_r, cd_2sat_cur_sz_f + cd_2sat_cur_sz_t, s->n, is_f, is_t);
 
         delete[] cd_2sat_l;
@@ -722,8 +717,6 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
         else if (is_2sat_sat)
             ix--;
         else {
-            for (__int64 i = ix - 1; i >= 0; i--)
-                s->Z[i] = false;
             while (ix < s->n - s->chops) {
                 if (!s->Z[ix] && always_f[ix])
                     ix++;
