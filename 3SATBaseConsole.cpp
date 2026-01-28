@@ -726,14 +726,10 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
                 }
 
             while (ix < s->n - s->chops) {
-                if (!s->Z[ix] && always_f[ix]) {
+                if (!s->Z[ix] && always_f[ix])
                     ix++;
-                    break;
-                }
-                else if (s->Z[ix] && always_t[ix]) {
+                else if (s->Z[ix] && always_t[ix])
                     ix++;
-                    break;
-                }
                 else if (!s->Z[ix] && ! always_f[ix]) {
                     s->Z[ix] = true;
                     is_f[ix] = false;
