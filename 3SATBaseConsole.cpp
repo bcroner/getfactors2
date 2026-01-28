@@ -655,11 +655,11 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
         }
 
     for (__int64 i = s->n - 1; i > ix; i--)
-        if (!always_f[i] && s->Z[i]) {
+        if (s->Z[i]) {
             is_t[i] = true;
             is_f[i] = false;
         }
-        else if (!always_t[i] && !s->Z[i]) {
+        else if (!s->Z[i]) {
             is_t[i] = false;
             is_f[i] = true;
 
@@ -717,18 +717,26 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
         else if (is_2sat_sat)
             ix--;
         else {
+
+            for (__int64 i = ix - 1; i >= 0; i--)
+                if (!always_t[i]) {
+                    s->Z[i] = false;
+                    is_f[i] = true;
+                    is_t[i] = false;
+                }
+
             while (ix < s->n - s->chops) {
                 if (!s->Z[ix] && always_f[ix])
                     ix++;
                 else if (s->Z[ix] && always_t[ix])
                     ix++;
-                else if (!s->Z[ix]) {
+                else if (!s->Z[ix] && ! always_f[ix]) {
                     s->Z[ix] = true;
                     is_f[ix] = false;
                     is_t[ix] = true;
                     break;
                 }
-                else if (s->Z[ix]) {
+                else if (s->Z[ix] && ! always_t[ix]) {
                     s->Z[ix] = false;
                     is_t[ix] = false;
                     is_f[ix] = true;
