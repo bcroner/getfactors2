@@ -721,8 +721,8 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
             for (__int64 i = ix - 1; i >= 0; i--)
                 if (!always_t[i]) {
                     s->Z[i] = false;
-                    is_f[i] = true;
                     is_t[i] = false;
+                    is_f[i] = true;
                 }
 
             while (ix < s->n - s->chops) {
