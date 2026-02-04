@@ -127,7 +127,11 @@ void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n, __int64
         s->inopcell_l[i] = lst[i][0];
         s->inopcell_m[i] = lst[i][1];
         s->inopcell_r[i] = lst[i][2];
+
+        printf_s("%lld: %lld %lld %lld\n", i, lst[i][0], lst[i][1], lst[i][2]);
     }
+
+    printf_s("\n");
 
     s->cdopcelll_f = new __int64* [n];
     s->cdopcellr_f = new __int64* [n];
@@ -279,11 +283,282 @@ bool bool_equals(bool* A, bool* B, __int64 n) {
     return true;
 }
 
-bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n_parm, bool* is_f_parm, bool* is_t_parm) {
+// https://github.com/mikolalysenko/strongly-connected-components/blob/master/scc.js
+
+function stronglyConnectedComponents(adjList) {
+    var numVertices = adjList.length;
+    var index = new Array(numVertices)
+        var lowValue = new Array(numVertices)
+        var active = new Array(numVertices)
+        var child = new Array(numVertices)
+        var scc = new Array(numVertices)
+        var sccLinks = new Array(numVertices)
+
+        //Initialize tables
+        for (var i = 0; i < numVertices; ++i) {
+            index[i] = -1
+                lowValue[i] = 0
+                active[i] = false
+                child[i] = 0
+                scc[i] = -1
+                sccLinks[i] = []
+        }
+
+    // The strongConnect function
+    var count = 0
+        var components = []
+        var sccAdjList = []
+
+        function strongConnect(v) {
+        // To avoid running out of stack space, this emulates the recursive behaviour of the normal algorithm, effectively using T as the call stack.
+        var S = [v], T = [v]
+            index[v] = lowValue[v] = count
+            active[v] = true
+            count += 1
+            while (T.length > 0) {
+                v = T[T.length - 1]
+                    var e = adjList[v]
+                    if (child[v] < e.length) { // If we're not done iterating over the children, first try finishing that.
+                        for (var i = child[v]; i < e.length; ++i) { // Start where we left off.
+                            var u = e[i]
+                                if (index[u] < 0) {
+                                    index[u] = lowValue[u] = count
+                                        active[u] = true
+                                        count += 1
+                                        S.push(u)
+                                        T.push(u)
+                                        break // First recurse, then continue here (with the same child!).
+                                        // There is a slight change to Tarjan's algorithm here.
+                                        // Normally, after having recursed, we set lowValue like we do for an active child (although some variants of the algorithm do it slightly differently).
+                                        // Here, we only do so if the child we recursed on is still active.
+                                        // The reasoning is that if it is no longer active, it must have had a lowValue equal to its own index, which means that it is necessarily higher than our lowValue.
+                                }
+                                else if (active[u]) {
+                                    lowValue[v] = Math.min(lowValue[v], lowValue[u]) | 0
+                                }
+                            if (scc[u] >= 0) {
+                                // Node v is not yet assigned an scc, but once it is that scc can apparently reach scc[u].
+                                sccLinks[v].push(scc[u])
+                            }
+                        }
+                        child[v] = i // Remember where we left off.
+                    }
+                    else { // If we're done iterating over the children, check whether we have an scc.
+                        if (lowValue[v] == = index[v]) { // TODO: It /might/ be true that T is always a prefix of S (at this point!!!), and if so, this could be used here.
+                            var component = []
+                                var links = [], linkCount = 0
+                                for (var i = S.length - 1; i >= 0; --i) {
+                                    var w = S[i]
+                                        active[w] = false
+                                        component.push(w)
+                                        links.push(sccLinks[w])
+                                        linkCount += sccLinks[w].length
+                                        scc[w] = components.length
+                                        if (w == = v) {
+                                            S.length = i
+                                                break
+                                        }
+                                }
+                            components.push(component)
+                                var allLinks = new Array(linkCount)
+                                for (var i = 0; i < links.length; i++) {
+                                    for (var j = 0; j < links[i].length; j++) {
+                                        allLinks[--linkCount] = links[i][j]
+                                    }
+                                }
+                            sccAdjList.push(allLinks)
+                        }
+                        T.pop() // Now we're finished exploring this particular node (normally corresponds to the return statement)
+                    }
+            }
+    }
+
+    //Run strong connect starting from each vertex
+    for (var i = 0; i < numVertices; ++i) {
+        if (index[i] < 0) {
+            strongConnect(i)
+        }
+    }
+
+    // Compact sccAdjList
+    var newE
+        for (var i = 0; i < sccAdjList.length; i++) {
+            var e = sccAdjList[i]
+                if (e.length == = 0) continue
+                    e.sort(function(a, b) { return a - b; })
+                    newE = [e[0]]
+                    for (var j = 1; j < e.length; j++) {
+                        if (e[j] != = e[j - 1]) {
+                            newE.push(e[j])
+                        }
+                    }
+            sccAdjList[i] = newE
+        }
+
+    return { components: components, adjacencyList : sccAdjList }
+}
+
+// https://github.com/mikolalysenko/binary-search-bounds/blob/master/search-bounds.js
+
+function ge(a, y, c, l, h) {
+    var i = h + 1;
+    while (l <= h) {
+        var m = (l + h) >> > 1, x = a[m];
+        var p = (c != = undefined) ? c(x, y) : (x - y);
+        if (p >= 0) { i = m; h = m - 1 }
+        else { l = m + 1 }
+    }
+    return i;
+};
+
+function gt(a, y, c, l, h) {
+    var i = h + 1;
+    while (l <= h) {
+        var m = (l + h) >> > 1, x = a[m];
+        var p = (c != = undefined) ? c(x, y) : (x - y);
+        if (p > 0) { i = m; h = m - 1 }
+        else { l = m + 1 }
+    }
+    return i;
+};
+
+function lt(a, y, c, l, h) {
+    var i = l - 1;
+    while (l <= h) {
+        var m = (l + h) >> > 1, x = a[m];
+        var p = (c != = undefined) ? c(x, y) : (x - y);
+        if (p < 0) { i = m; l = m + 1 }
+        else { h = m - 1 }
+    }
+    return i;
+};
+
+function le(a, y, c, l, h) {
+    var i = l - 1;
+    while (l <= h) {
+        var m = (l + h) >> > 1, x = a[m];
+        var p = (c != = undefined) ? c(x, y) : (x - y);
+        if (p <= 0) { i = m; l = m + 1 }
+        else { h = m - 1 }
+    }
+    return i;
+};
+
+function eq(a, y, c, l, h) {
+    while (l <= h) {
+        var m = (l + h) >> > 1, x = a[m];
+        var p = (c != = undefined) ? c(x, y) : (x - y);
+        if (p == = 0) { return m }
+        if (p <= 0) { l = m + 1 }
+        else { h = m - 1 }
+    }
+    return -1;
+};
+
+function norm(a, y, c, l, h, f) {
+    if (typeof c == = 'function') {
+        return f(a, y, c, (l == = undefined) ? 0 : l | 0, (h == = undefined) ? a.length - 1 : h | 0);
+    }
+    return f(a, y, undefined, (c == = undefined) ? 0 : c | 0, (l == = undefined) ? a.length - 1 : l | 0);
+}
+
+// https://github.com/mikolalysenko/2-sat/blob/master/2sat.js
+
+function clauseToVariable(x, n) {
+    if (x < 0) {
+        return (-1 - x) + n
+    }
+    else {
+        return x - 1
+    }
+}
+
+function negate(x, n) {
+    if (x < n) {
+        return x + n
+    }
+    else {
+        return x - n
+    }
+}
+
+function compareInt(a, b) {
+    return a - b
+}
+
+function contains(cc, v) {
+    var b = bounds.le(cc, v)
+        if (b >= 0) {
+            return cc[b] == = v
+        }
+    return false
+}
+
+function solve2Sat(numVariables, clauses) {
+    //Build implication graph
+    var adj = new Array(2 * numVariables)
+        for (var i = 0; i < 2 * numVariables; ++i) {
+            adj[i] = []
+        }
+    for (var i = 0; i < clauses.length; ++i) {
+        var c = clauses[i]
+            var a = clauseToVariable(c[0], numVariables)
+            var b = clauseToVariable(c[1], numVariables)
+            var na = negate(a, numVariables)
+            adj[na].push(b)
+            var nb = negate(b, numVariables)
+            adj[nb].push(a)
+    }
+
+    //Extract strongly connected components
+    var scc = stronglyConnectedComponents(adj).components
+
+        //Mark cells and check satisfiability
+        var solution = new Array(2 * numVariables)
+        for (var i = 0; i < solution.length; ++i) {
+            solution[i] = -1
+        }
+
+    for (var i = 0; i < scc.length; ++i) {
+        var cc = scc[i]
+            cc.sort(compareInt)
+
+            //Visit all nodes in queue
+            var to_visit = []
+            var color = 0
+            for (var j = 0; j < cc.length; ++j) {
+                var v = cc[j]
+                    if (v < numVariables && contains(cc, numVariables + v)) {
+                        return false
+                    }
+                var s = solution[v]
+                    if (s >= 0) {
+                        color = s
+                    }
+            }
+
+        //Update solution in component
+        for (var j = 0; j < cc.length; ++j) {
+            var v = cc[j]
+                var nv = negate(v, numVariables)
+                solution[v] = color
+                solution[nv] = color ^ 1
+                var e = color ? adj[v] : adj[nv]
+                for (var k = 0; k < e.length; ++k) {
+                    solution[e[k]] = 1
+                }
+        }
+    }
+
+    solution.length = numVariables
+        return solution
+}
+
+bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n_parm) {
 
     bool is_sat = false;
 
-    __int64 counter = 2;
+    __int64 counter = 1;
 
     __int64* encoding = new __int64[n_parm]; // from 2..n_parm to 2..n
     __int64* decoding = new __int64[n_parm]; // from 2..n to 2..n_parm
@@ -293,27 +568,10 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
         decoding[i] = 0;
     }
 
-    for (__int64 i = 2; i < n_parm; i++) {
-        if (is_f_parm[i]) {
-            encoding[i] = counter;
-            decoding[counter] = i;
-            counter++;
-        }
-        else if (is_t_parm[i]) {
-            encoding[i] = counter;
-            decoding[counter] = i;
-            counter++;
-        }
-    }
-
     bool* used = new bool[n_parm];
 
     for (__int64 i = 0; i < n_parm; i++)
         used[i] = false;
-
-    for (__int64 i = 0; i < n_parm; i++)
-        if (is_f_parm[i] || is_t_parm[i])
-            used[i] = true;
 
     for (__int64 i = 0; i < k_parm; i++) {
 
@@ -324,66 +582,22 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
         used[r_abs] = true;
     }
 
-    __int64 n = 2;
+    __int64 n = 0;
 
     for (__int64 i = 2; i < n_parm; i++)
         if (used[i])
             n++;
 
     for (__int64 i = 2; i < n_parm; i++) {
-        if (used[i] && ! is_f_parm[i] && ! is_t_parm[i]) {
+        if (used[i]) {
             encoding[i] = counter;
             decoding[counter] = i;
             counter++;
         }
     }
 
-    __int64* is_f = new __int64[n];
-    __int64* is_t = new __int64[n];
-
-    for (__int64 i = 0; i < n; i++) {
-        is_f[i] = false;
-        is_t[i] = false;
-    }
-
-    for (__int64 i = 2; i < n; i++) {
-        if (is_f_parm[decoding[i]])
-            is_f[i] = true;
-        if (is_t_parm[decoding[i]])
-            is_t[i] = true;
-    }
-
-    __int64 k = 0;
-
-    for (__int64 i = 0; i < k_parm; i++) {
-        if (lst_l_parm[i] != FALSE_3SAT && lst_r_parm[i] != FALSE_3SAT) {
-            k++;
-            continue;
-        }
-
-        __int64 val = lst_l_parm[i] == FALSE_3SAT ? lst_r_parm[i] : lst_l_parm[i];
-        __int64 val_abs = val < 0 ? -val : val;
-
-        if (val < 0)
-            is_f[encoding[val_abs]] = true;
-        else
-            is_t[encoding[val_abs]] = true;
-    }
-
-    __int64** false_implies = new __int64* [n];
-    __int64** true_implies = new __int64* [n];
-
-    __int64* false_implies_sz = new __int64[n];
-    __int64* true_implies_sz = new __int64[n];
-
-    for (__int64 i = 0; i < n; i++) {
-
-        false_implies_sz[i] = 0;
-        true_implies_sz[i] = 0;
-    }
-
-    __int64* lst_l = new __int64[k];
-    __int64* lst_r = new __int64[k];
+    __int64* lst_l = new __int64[k_parm];
+    __int64* lst_r = new __int64[k_parm];
 
     for (__int64 i = 0; i < k; i++) {
         lst_l[i] = 0;
@@ -393,158 +607,16 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
     __int64 counter_k = 0;
 
     for (__int64 i = 0; i < k_parm; i++) {
-        if (lst_l_parm[i] != FALSE_3SAT && lst_r_parm[i] != FALSE_3SAT) {
 
-            __int64 l_abs = lst_l_parm[i] < 0 ? -lst_l_parm[i] : lst_l_parm[i];
-            __int64 r_abs = lst_r_parm[i] < 0 ? -lst_r_parm[i] : lst_r_parm[i];
+        __int64 l_abs = lst_l_parm[i] < 0 ? -lst_l_parm[i] : lst_l_parm[i];
+        __int64 r_abs = lst_r_parm[i] < 0 ? -lst_r_parm[i] : lst_r_parm[i];
 
-            lst_l[counter_k] = lst_l_parm[i] < 0 ? -encoding[l_abs] : encoding[l_abs];
-            lst_r[counter_k] = lst_r_parm[i] < 0 ? -encoding[r_abs] : encoding[r_abs];
+        lst_l[counter_k] = lst_l_parm[i] < 0 ? -encoding[l_abs] : encoding[l_abs];
+        lst_r[counter_k] = lst_r_parm[i] < 0 ? -encoding[r_abs] : encoding[r_abs];
 
-            counter_k++;
-        }
+        counter_k++;
     }
 
-    for (__int64 i = 0; i < k; i++) {
-
-        __int64 l_abs = lst_l[i] < 0 ? -lst_l[i] : lst_l[i];
-        __int64 r_abs = lst_r[i] < 0 ? -lst_r[i] : lst_r[i];
-
-        if (lst_l[i] < 0)
-            true_implies_sz[l_abs]++;
-        else
-            false_implies_sz[l_abs]++;
-
-        if (lst_r[i] < 0)
-            true_implies_sz[r_abs]++;
-        else
-            false_implies_sz[r_abs]++;
-    }
-
-    for (__int64 i = 0; i < n; i++) {
-        true_implies[i] = new __int64[true_implies_sz[i]];
-        false_implies[i] = new __int64[false_implies_sz[i]];
-    }
-
-    for (__int64 i = 0; i < n; i++) {
-        for (__int64 j = 0; j < true_implies_sz[i]; j++)
-            true_implies[i][j] = 0;
-        for (__int64 j = 0; j < false_implies_sz[i]; j++)
-            false_implies[i][j] = 0;
-    }
-
-    __int64* true_implies_counter = new __int64[n];
-    __int64* false_implies_counter = new __int64[n];
-
-    for (__int64 i = 0; i < n; i++) {
-        true_implies_counter[i] = 0;
-        false_implies_counter[i] = 0;
-    }
-
-    for (__int64 i = 0; i < k; i++) {
-
-        __int64 l_abs = lst_l[i] < 0 ? -lst_l[i] : lst_l[i];
-        __int64 r_abs = lst_r[i] < 0 ? -lst_r[i] : lst_r[i];
-
-        if (lst_l[i] < 0) {
-            true_implies[l_abs][true_implies_counter[l_abs]] = lst_r[i];
-            true_implies_counter[l_abs]++;
-        }
-        else {
-            false_implies[l_abs][false_implies_counter[l_abs]] = lst_r[i];
-            false_implies_counter[l_abs]++;
-        }
-        if (lst_r[i] < 0) {
-            true_implies[r_abs][true_implies_counter[r_abs]] = lst_l[i];
-            true_implies_counter[r_abs]++;
-        }
-        else {
-            false_implies[r_abs][false_implies_counter[r_abs]] = lst_l[i];
-            false_implies_counter[r_abs]++;
-        }
-    }
-
-    bool* Z = new bool[n];
-
-    for (__int64 i = 0; i < n; i++)
-        Z[i] = false;
-
-    bool* falses = new bool[n];
-    bool* trues = new bool[n];
-
-    __int64 ix = n - 1;
-
-    while (true) {
-
-        for (__int64 i = 0; i < n; i++) {
-            falses[i] = false;
-            trues[i] = false;
-        }
-        
-        for (__int64 i = 0; i < n; i++) {
-
-            if (is_f[i])
-                falses[i] = true;
-
-            if (is_t[i])
-                trues[i] = true;
-
-        }
-
-        for (__int64 i = 2; i < n; i++) {
-            if (Z[i])
-                for (__int64 j = 0; j < true_implies_sz[i]; j++) {
-                    __int64 val_abs = true_implies[i][j] < 0 ? - true_implies[i][j] : true_implies[i][j];
-                    if (true_implies[i][j] < 0)
-                        falses[val_abs] = true;
-                    else
-                        trues[val_abs] = true;
-                }
-            else
-                for (__int64 j = 0; j < false_implies_sz[i]; j++) {
-                    __int64 val_abs = false_implies[i][j] < 0 ? -false_implies[i][j] : false_implies[i][j];
-                    if (false_implies[i][j] < 0)
-                        falses[val_abs] = true;
-                    else
-                        trues[val_abs] = true;
-                }
-        }
-
-        bool contradiction = false;
-
-        for (__int64 i = 2; i < n; i++)
-            if (trues[i] && falses[i]) {
-                contradiction = true;
-                break;
-            }
-
-        if (!contradiction && ix == 2) {
-
-            is_sat = true;
-            break;
-
-        }
-        else if (!contradiction)
-            ix--;
-        else {
-            for (__int64 i = ix - 1; i >= 0; i--)
-                Z[i] = false;
-            while (ix < n) {
-                if (!Z[ix]) {
-                    Z[ix] = true;
-                    break;
-                }
-                else {
-                    Z[ix] = false;
-                    ix++;
-                }
-            }
-        }
-
-        if (ix == n)
-            break;
-
-    }
 
     // clean up
 
@@ -553,31 +625,8 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
 
     delete[] used;
 
-    delete[] is_f;
-    delete[] is_t;
-
-    for (__int64 i = 0; i < n; i++) {
-
-        delete[] false_implies[i];
-        delete[] true_implies[i];
-    }
-
-    delete[] false_implies;
-    delete[] true_implies;
-
-    delete[] false_implies_sz;
-    delete[] true_implies_sz;
-
     delete[] lst_l;
     delete[] lst_r;
-
-    delete[] true_implies_counter;
-    delete[] false_implies_counter;
-
-    delete[] Z;
-
-    delete[] falses;
-    delete[] trues;
 
     return is_sat;
 }
@@ -639,58 +688,22 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
             return false;
         }
 
+    __int64 count_always_t = 0;
+    __int64 count_always_f = 0;
+
+    for (__int64 i = 0; i < s->n; i++)
+        if (always_t[i])
+            count_always_t++;
+
+    for (__int64 i = 0; i < s->n; i++)
+        if (always_f[i])
+            count_always_f++;
+
     bool is_sat = false;
 
     while (true) {
 
-        for (__int64 i = 0; i < s->n; i++) {
-            is_f[i] = false;
-            is_t[i] = false;
-        }
-
-        for (__int64 i = 0; i < s->n; i++) {
-            if (always_f[i])
-                is_f[i] = true;
-            if (always_t[i])
-                is_t[i] = true;
-        }
-
-        for (__int64 i = s->n - 1; i >= 0; i--)
-            if (s->Z[i]) {
-                if (always_f[i] || always_t[i]) {
-                    if (always_f[i]) {
-                        is_f[i] = true;
-                        is_t[i] = false;
-                    }
-                    if (always_t[i]) {
-                        is_f[i] = false;
-                        is_t[i] = true;
-                    }
-                }
-                else {
-                    is_f[i] = false;
-                    is_t[i] = true;
-                }
-            }
-            else if (!s->Z[i]) {
-                if (always_f[i] || always_t[i]) {
-                    if (always_f[i]) {
-                        is_f[i] = true;
-                        is_t[i] = false;
-                    }
-                    if (always_t[i]) {
-                        is_f[i] = false;
-                        is_t[i] = true;
-                    }
-                }
-                else {
-                    is_f[i] = true;
-                    is_t[i] = false;
-                }
-
-            }
-
-        __int64 size_2sat = 0;
+        __int64 size_2sat = count_always_f + count_always_t;
 
         for (__int64 i = s->n - 1; i >= ix; i--)
             if (s->Z[i])
@@ -702,6 +715,19 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
         __int64* cd_2sat_r = new __int64[size_2sat];
         __int64 cd_2sat_cur_sz_f = 0;
         __int64 cd_2sat_cur_sz_t = 0;
+
+        for (__int64 i = 2; i < s->n; i++) {
+            if (always_f[i]) {
+                cd_2sat_l[cd_2sat_cur_sz_f] = i;
+                cd_2sat_r[cd_2sat_cur_sz_f] = i;
+                cd_2sat_cur_sz_f++;
+            }
+            if (always_t[i]) {
+                cd_2sat_l[cd_2sat_cur_sz_t] = i;
+                cd_2sat_r[cd_2sat_cur_sz_t] = i;
+                cd_2sat_cur_sz_t++;
+            }
+        }
 
         for (__int64 i = s->n - 1; i >= ix; i--) {
             if (s->Z[i]) {
