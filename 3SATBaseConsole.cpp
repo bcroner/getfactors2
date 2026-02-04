@@ -643,28 +643,28 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
             return false;
         }
 
-    for (__int64 i = 0; i < s->n; i++)
-        if (always_f[i])
-            is_f[i] = true;
-        else if (always_t[i])
-            is_t[i] = true;
-
-    for (__int64 i = s->n - 1; i > ix; i--)
-        if (s->Z[i]) {
-            is_t[i] = true;
-            if (! always_t[i])
-                is_f[i] = false;
-        }
-        else if (!s->Z[i]) {
-            if (! always_f[i])
-                is_t[i] = false;
-            is_f[i] = true;
-
-        }
-
     bool is_sat = false;
 
     while (true) {
+
+        for (__int64 i = 0; i < s->n; i++)
+            if (always_f[i])
+                is_f[i] = true;
+            else if (always_t[i])
+                is_t[i] = true;
+
+        for (__int64 i = s->n - 1; i > ix; i--)
+            if (s->Z[i]) {
+                is_t[i] = true;
+                if (!always_t[i])
+                    is_f[i] = false;
+            }
+            else if (!s->Z[i]) {
+                if (!always_f[i])
+                    is_t[i] = false;
+                is_f[i] = true;
+
+            }
 
         __int64 size_2sat = 0;
 
