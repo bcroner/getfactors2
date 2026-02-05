@@ -49,7 +49,7 @@ void simp_vector_append(__int64** v, __int64* vtop, __int64* vcap, __int64 data)
 bool* SATSolver_create_boundary(bool begin, __int64 chop, __int64 offs, __int64 n);
 void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n, __int64 chops, __int64 chop);
 void SATSolver_destroy(SATSolver* s);
-bool two_sat(__int64* lst_l_parm, __int64* lst_parm, __int64 k_parm, __int64 n_parm);
+bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n_parm, __int64* is_f, __int64* is_t);
 bool SATSolver_isSat(SATSolver* s, bool* sln);
 
 #endif

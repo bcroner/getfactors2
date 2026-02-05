@@ -354,10 +354,10 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
     for (__int64 i = 0; i < n; i++)
         Z[i] = false;
 
-    while (true) {
+    bool* falses = new bool[n];
+    bool* trues = new bool[n];
 
-        bool* falses = new bool[n];
-        bool* trues = new bool[n];
+    while (true) {
 
         for (__int64 i = 0; i < n; i++) {
             falses[i] = false;
@@ -447,6 +447,9 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
     }
 
     // clean up
+
+    delete[] falses;
+    delete[] trues;
 
     delete[] Z;
 
