@@ -438,7 +438,7 @@ void stronglyConnectedComponents(__int64** adjList, __int64* adjList_top, __int6
 
         *(sccAdjList_cap[i]) = 16;
         *(sccAdjList_top[i]) = -1;
-        sccAdjList_cap[i] = simp_stack_create(&(*(sccAdjList_top[i])), &(*(sccAdjList_cap[i])));
+        *(sccAdjList[i]) = simp_stack_create(&(*(sccAdjList_top[i])), &(*(sccAdjList_cap[i])));
     }
 
     //Run strong connect starting from each vertex
@@ -541,6 +541,15 @@ void stronglyConnectedComponents(__int64** adjList, __int64* adjList_top, __int6
                             simp_stack_push(&(temp_sccAdjList[v]), &(temp_sccAdjList_top[v]), &(temp_sccAdjList_cap[v]), allLinks[j]);
 
                         simp_stack_pop(T, &T_top, T_cap); // Now we're finished exploring this particular node (normally corresponds to the return statement)
+
+                        // clean up
+
+                        for (__int64 j = 0; j < S_top + 1; j++)
+                            delete[] links[j];
+
+                        delete[] links_cap;
+                        delete[] links_top;
+                        delete[] links;
                     }
 
                 }
@@ -576,6 +585,23 @@ void stronglyConnectedComponents(__int64** adjList, __int64* adjList_top, __int6
         *(sccAdjList_top[i]) = newE_top;
         *(sccAdjList_cap[i]) = newE_cap;
     }
+
+    // clean up
+
+    for (__int64 i = 0; i < numVertices; i++)
+        delete[] sccLinks[i];
+
+    delete[] sccLinks_top;
+    delete[] sccLinks_cap;
+    delete[] sccLinks;
+
+    for (__int64 i = 0; i < numVertices; i++)
+        delete[] temp_sccAdjList[i];
+
+    delete[] temp_sccAdjList_top;
+    delete[] temp_sccAdjList_cap;
+    delete[] temp_sccAdjList;
+
 }
 
 // https://github.com/mikolalysenko/2-sat/blob/master/2sat.js
