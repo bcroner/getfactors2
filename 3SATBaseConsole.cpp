@@ -580,114 +580,166 @@ void stronglyConnectedComponents(__int64** adjList, __int64* adjList_len, __int6
 
 // https://github.com/mikolalysenko/binary-search-bounds/blob/master/search-bounds.js
 
-function ge(a, y, c, l, h) {
-    var i = h + 1;
+__int64 ge (__int64 *a, __int64 y, c, __int64 l, __int64 h) {
+
+    __int64 i = h + 1;
+
     while (l <= h) {
-        var m = (l + h) >> > 1, x = a[m];
-        var p = (c != = undefined) ? c(x, y) : (x - y);
-        if (p >= 0) { i = m; h = m - 1 }
-        else { l = m + 1 }
+
+        __int64 m = (l + h) >> 1;
+        __int64 x = a[m];
+        __int64 p = (c != undefined) ? c(x, y) : (x - y);
+
+        if (p >= 0) {
+            i = m;
+            h = m - 1;
+        }
+        else
+            l = m + 1;
     }
     return i;
-};
+}
 
-function gt(a, y, c, l, h) {
-    var i = h + 1;
+__int64 gt (__int64 *a, __int64 y, c, __int64 l, __int64 h) {
+
+    __int64 i = h + 1;
+
     while (l <= h) {
-        var m = (l + h) >> > 1, x = a[m];
-        var p = (c != = undefined) ? c(x, y) : (x - y);
-        if (p > 0) { i = m; h = m - 1 }
-        else { l = m + 1 }
+
+        __int64 m = (l + h) >> 1;
+        __int64 x = a[m];
+        __int64 p = (c != undefined) ? c(x, y) : (x - y);
+
+        if (p > 0) {
+            i = m;
+            h = m - 1;
+        }
+        else
+            l = m + 1;
     }
     return i;
-};
+}
 
-function lt(a, y, c, l, h) {
-    var i = l - 1;
+__int64 lt (__int64 *a, __int64 y, c, __int64 l, __int64 h) {
+
+    __int64 i = l - 1;
+
     while (l <= h) {
-        var m = (l + h) >> > 1, x = a[m];
-        var p = (c != = undefined) ? c(x, y) : (x - y);
-        if (p < 0) { i = m; l = m + 1 }
-        else { h = m - 1 }
+
+        __int64 m = (l + h) >> 1;
+        __int64 x = a[m];
+        __int64 p = (c != undefined) ? c(x, y) : (x - y);
+
+        if (p < 0) {
+            i = m;
+            l = m + 1;
+        }
+        else
+            h = m - 1;
     }
     return i;
-};
+}
 
-function le(a, y, c, l, h) {
-    var i = l - 1;
+__int64 le (__int64* a, __int64 y, c, __int64 l, __int64 h) {
+
+    __int64 i = l - 1;
+
     while (l <= h) {
-        var m = (l + h) >> > 1, x = a[m];
-        var p = (c != = undefined) ? c(x, y) : (x - y);
-        if (p <= 0) { i = m; l = m + 1 }
-        else { h = m - 1 }
+
+        __int64 m = (l + h) >> 1;
+        __int64 x = a[m];
+        __int64 p = (c != undefined) ? c(x, y) : (x - y);
+
+        if (p <= 0) {
+            i = m;
+            l = m + 1;
+        }
+        else
+            h = m - 1;
     }
     return i;
-};
+}
 
-function eq(a, y, c, l, h) {
+__int64 eq (__int64 *a, __int64 y, c, __int64 l, __int64 h) {
+
     while (l <= h) {
-        var m = (l + h) >> > 1, x = a[m];
-        var p = (c != = undefined) ? c(x, y) : (x - y);
-        if (p == = 0) { return m }
-        if (p <= 0) { l = m + 1 }
-        else { h = m - 1 }
+
+        __int64 m = (l + h) >> 1;
+        __int64 x = a[m];
+        __int64 p = (c != = undefined) ? c(x, y) : (x - y);
+
+        if (p == 0)
+            return m;
+        if (p <= 0)
+            l = m + 1;
+        else
+            h = m - 1;
     }
     return -1;
-};
+}
 
-function norm(a, y, c, l, h, f) {
-    if (typeof c == = 'function') {
-        return f(a, y, c, (l == = undefined) ? 0 : l | 0, (h == = undefined) ? a.length - 1 : h | 0);
+__int64 norm (__int64* a, __int64 a_top, __int64 y, c, __int64 l, __int64 h, f) {
+
+    if (typeof c == 'function') {
+        return f(a, y, c, (l == undefined) ? 0 : l | 0, (h == undefined) ? a_top : h | 0);
     }
-    return f(a, y, undefined, (c == = undefined) ? 0 : c | 0, (l == = undefined) ? a.length - 1 : l | 0);
+    return f(a, y, undefined, (c == undefined) ? 0 : c | 0, (l == undefined) ? a_top : l | 0);
 }
 
 // https://github.com/mikolalysenko/2-sat/blob/master/2sat.js
 
-function clauseToVariable(x, n) {
-    if (x < 0) {
-        return (-1 - x) + n
-    }
-    else {
-        return x - 1
-    }
+__int64 clauseToVariable (__int64 x, __int64 n) {
+
+    if (x < 0)
+        return (-1 - x) + n;
+    else
+        return x - 1;
 }
 
-function negate(x, n) {
-    if (x < n) {
-        return x + n
-    }
-    else {
-        return x - n
-    }
+__int64 negate (__int64 x, __int64 n) {
+
+    if (x < n)
+        return x + n;
+    else
+        return x - n;
 }
 
-function compareInt(a, b) {
-    return a - b
+__int64 compareInt (__int64 a, __int64 b) {
+
+    return a - b;
 }
 
-function contains(cc, v) {
-    var b = bounds.le(cc, v)
-        if (b >= 0) {
-            return cc[b] == = v
-        }
-    return false
+bool contains (__int64* cc, __int64 cc_top, __int64 v) {
+
+    for (__int64 i = 0; i < cc_top + 1; i++)
+        if (cc[i] == v)
+            return true;
+
+    return false;
 }
 
-function solve2Sat(numVariables, clauses) {
+bool solve2Sat(__int64 numVariables, __int64* clauses_l, __int64* clauses_r, __int64 k) {
+
     //Build implication graph
-    var adj = new Array(2 * numVariables)
-        for (var i = 0; i < 2 * numVariables; ++i) {
-            adj[i] = []
-        }
-    for (var i = 0; i < clauses.length; ++i) {
-        var c = clauses[i]
-            var a = clauseToVariable(c[0], numVariables)
-            var b = clauseToVariable(c[1], numVariables)
-            var na = negate(a, numVariables)
-            adj[na].push(b)
-            var nb = negate(b, numVariables)
-            adj[nb].push(a)
+    __int64* adj_top = new __int64[2 * numVariables];
+    __int64* adj_cap = new __int64[2 * numVariables];
+    __int64** adj = new __int64* [2 * numVariables];
+
+    for (__int64 i = 0; i < 2 * numVariables; ++i) {
+
+        adj_top[i] = -1;
+        adj_cap[i] = 16;
+        adj[i] = simp_stack_create(&(adj_top[i]), &(adj_cap[i]));
+    }
+
+    for (__int64 i = 0; i < k; i++) {
+
+        __int64 a = clauseToVariable(clauses_l[i], numVariables);
+        __int64 b = clauseToVariable(clauses_r[i], numVariables);
+        __int64 na = negate(a, numVariables);
+        simp_stack_push(&(adj[na]), &(adj_top[na]), &(adj_cap[na]), b);
+        __int64 nb = negate(b, numVariables);
+        simp_stack_push(&(adj[nb]), &(adj_top[nb]), &(adj_cap[nb]), a);
     }
 
     //Extract strongly connected components
