@@ -364,11 +364,11 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
             trues[i] = false;
         }
 
-        for (__int64 i = 0; i < n; i++) {
+        for (__int64 i = 0; i < n_parm; i++) {
             if (is_f[i])
-                falses[i] = true;
+                falses[encoding[i]] = true;
             if (is_t[i])
-                trues[i] = true;
+                trues[encoding[i]] = true;
         }
 
         for (__int64 i = n - 1; i >= ix; i--)
