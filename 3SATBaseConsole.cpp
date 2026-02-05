@@ -550,14 +550,14 @@ void stronglyConnectedComponents(__int64** adjList, __int64* adjList_len, __int6
 
     // Compact sccAdjList
 
-    __int64 newE_top = -1;
-    __int64 newE_cap = 16;
-    __int64* newE = simp_stack_create(&newE_top, &newE_cap);
-
     for (__int64 i = 0; i < numVertices; i++) {
 
         if (temp_sccAdjList_top[i] + 1 == 0)
             continue;
+
+        __int64 newE_top = -1;
+        __int64 newE_cap = 16;
+        __int64* newE = simp_stack_create(&newE_top, &newE_cap);
 
         __int64* e = new __int64[temp_sccAdjList_top[i] + 1];
 
