@@ -82,6 +82,32 @@ void simp_vector_append(__int64** v, __int64* vtop, __int64* vcap, __int64 data)
 
 }
 
+__int64* simp_stack_create(__int64* vtop, __int64 *vcap) {
+
+    *vtop = -1;
+    *vcap = 16;
+    return simp_vector_create(*vcap);
+
+}
+
+__int64 simp_stack_pop(__int64* s, __int64* vtop, __int64 vcap) {
+
+    if (*vtop == -1)
+        return 0;
+    else {
+        *vtop = *vtop - 1;
+        return simp_vector_read(s, *vtop, vcap, *vtop + 1);
+    }
+}
+
+void simp_stack_push(__int64** s, __int64* vtop, __int64* vcap, __int64 data) {
+
+    simp_vector_append(s, vtop, vcap, data);
+    *vtop = *vtop + 1;
+
+}
+
+
 bool* SATSolver_create_boundary(bool begin, __int64 chop, __int64 offs, __int64 n) {
 
     bool* ret = new bool[n];
@@ -283,119 +309,273 @@ bool bool_equals(bool* A, bool* B, __int64 n) {
     return true;
 }
 
-// https://github.com/mikolalysenko/strongly-connected-components/blob/master/scc.js
+// https://www.geeksforgeeks.org/c-program-for-iterative-quick-sort/
 
-function stronglyConnectedComponents(adjList) {
-    var numVertices = adjList.length;
-    var index = new Array(numVertices)
-        var lowValue = new Array(numVertices)
-        var active = new Array(numVertices)
-        var child = new Array(numVertices)
-        var scc = new Array(numVertices)
-        var sccLinks = new Array(numVertices)
+/* This function is same in both iterative and recursive*/
+__int64 partition(__int64 arr_parm[], __int64 low_parm, __int64 high_parm)
+{
+    __int64 pivot = arr_parm[high_parm];    // pivot
+    __int64 i = (low_parm - 1);  // Index of smaller element
 
-        //Initialize tables
-        for (var i = 0; i < numVertices; ++i) {
-            index[i] = -1
-                lowValue[i] = 0
-                active[i] = false
-                child[i] = 0
-                scc[i] = -1
-                sccLinks[i] = []
+    for (__int64 j = low_parm; j <= high_parm - 1; j++)
+    {
+        // swap if current element is greater than pivot
+        if (arr_parm[j] > pivot)
+        {
+            i++;    // increment index of smaller element
+            __int64 t = arr_parm[i];
+            arr_parm[i] = arr_parm[j];
+            arr_parm[j] = t;
+        }
+    }
+    __int64 t = arr_parm[i + 1];
+    arr_parm[i + 1] = arr_parm[high_parm];
+    arr_parm[high_parm] = t;
+    return (i + 1);
+}
+
+/* A[] --> Array to be sorted,
+   l  --> Starting index,
+   h  --> Ending index */
+void MyQSort(__int64 arr[], __int64 l, __int64 h)
+{
+    // Create an auxiliary stack
+    __int64* stack = new __int64[h - l + 1];
+
+    // initialize top of stack
+    __int64 top = -1;
+
+    // push initial values of l and h to stack
+    stack[++top] = l;
+    stack[++top] = h;
+
+    // Keep popping from stack while is not empty
+    while (top >= 0) {
+        // Pop h and l
+        h = stack[top--];
+        l = stack[top--];
+
+        // Set pivot element at its correct position
+        // in sorted array
+        __int64 p = partition(arr, l, h);
+
+        // If there are elements on left side of pivot,
+        // then push left side to stack
+        if (p - 1 > l) {
+            stack[++top] = l;
+            stack[++top] = p - 1;
         }
 
-    // The strongConnect function
-    var count = 0
-        var components = []
-        var sccAdjList = []
+        // If there are elements on right side of pivot,
+        // then push right side to stack
+        if (p + 1 < h) {
+            stack[++top] = p + 1;
+            stack[++top] = h;
+        }
+    }
 
-        function strongConnect(v) {
-        // To avoid running out of stack space, this emulates the recursive behaviour of the normal algorithm, effectively using T as the call stack.
-        var S = [v], T = [v]
-            index[v] = lowValue[v] = count
-            active[v] = true
-            count += 1
-            while (T.length > 0) {
-                v = T[T.length - 1]
-                    var e = adjList[v]
-                    if (child[v] < e.length) { // If we're not done iterating over the children, first try finishing that.
-                        for (var i = child[v]; i < e.length; ++i) { // Start where we left off.
-                            var u = e[i]
-                                if (index[u] < 0) {
-                                    index[u] = lowValue[u] = count
-                                        active[u] = true
-                                        count += 1
-                                        S.push(u)
-                                        T.push(u)
-                                        break // First recurse, then continue here (with the same child!).
-                                        // There is a slight change to Tarjan's algorithm here.
-                                        // Normally, after having recursed, we set lowValue like we do for an active child (although some variants of the algorithm do it slightly differently).
-                                        // Here, we only do so if the child we recursed on is still active.
-                                        // The reasoning is that if it is no longer active, it must have had a lowValue equal to its own index, which means that it is necessarily higher than our lowValue.
-                                }
-                                else if (active[u]) {
-                                    lowValue[v] = Math.min(lowValue[v], lowValue[u]) | 0
-                                }
-                            if (scc[u] >= 0) {
-                                // Node v is not yet assigned an scc, but once it is that scc can apparently reach scc[u].
-                                sccLinks[v].push(scc[u])
-                            }
-                        }
-                        child[v] = i // Remember where we left off.
-                    }
-                    else { // If we're done iterating over the children, check whether we have an scc.
-                        if (lowValue[v] == = index[v]) { // TODO: It /might/ be true that T is always a prefix of S (at this point!!!), and if so, this could be used here.
-                            var component = []
-                                var links = [], linkCount = 0
-                                for (var i = S.length - 1; i >= 0; --i) {
-                                    var w = S[i]
-                                        active[w] = false
-                                        component.push(w)
-                                        links.push(sccLinks[w])
-                                        linkCount += sccLinks[w].length
-                                        scc[w] = components.length
-                                        if (w == = v) {
-                                            S.length = i
-                                                break
-                                        }
-                                }
-                            components.push(component)
-                                var allLinks = new Array(linkCount)
-                                for (var i = 0; i < links.length; i++) {
-                                    for (var j = 0; j < links[i].length; j++) {
-                                        allLinks[--linkCount] = links[i][j]
-                                    }
-                                }
-                            sccAdjList.push(allLinks)
-                        }
-                        T.pop() // Now we're finished exploring this particular node (normally corresponds to the return statement)
-                    }
-            }
+    delete[] stack;
+}
+
+
+// https://github.com/mikolalysenko/strongly-connected-components/blob/master/scc.js
+
+void stronglyConnectedComponents(__int64** adjList, __int64* adjList_len, __int64 numVertices, __int64 ***components, __int64** components_top, __int64** components_cap, __int64 ***sccAdjList, __int64** sccAdjList_top, __int64** sccAdjList_cap) {
+
+    __int64* index = new __int64[numVertices];
+    __int64* lowValue = new __int64[numVertices];
+    bool* active = new bool[numVertices];
+    __int64* child = new __int64[numVertices];
+
+    __int64* scc = new __int64[numVertices];
+
+    __int64* sccLinks_top = new __int64[numVertices];
+    __int64* sccLinks_cap = new __int64[numVertices];
+    __int64** sccLinks = new __int64* [numVertices];
+
+    for (__int64 i = 0; i < numVertices; i++) {
+
+        sccLinks_top[i] = -1;
+        sccLinks_cap[i] = 16;
+        sccLinks[i] = simp_stack_create(&(sccLinks_top[i]), &(sccLinks_cap[i]));
+    }
+
+    //Initialize tables
+    for (__int64 i = 0; i < numVertices; ++i) {
+        index[i] = -1;
+        lowValue[i] = 0;
+        active[i] = false;
+        child[i] = 0;
+        scc[i] = -1;
+        sccLinks[i] = simp_stack_create(&(sccLinks_top[i]), &(sccLinks_cap[i]));
+    }
+
+    // The strongConnect function
+    __int64 count = 0;
+    *components_cap = new __int64[numVertices];
+    *components_top = new __int64[numVertices];
+
+    for (__int64 i = 0; i < numVertices; i++) {
+
+        *(components_cap[i]) = 16;
+        *(components_top[i]) = -1;
+        *(components[i]) = simp_stack_create(&(*(components_cap[i])), &(*(components_top[i])));
+    }
+
+    __int64* temp_sccAdjList_top = new __int64[numVertices];
+    __int64* temp_sccAdjList_cap = new __int64[numVertices];
+    __int64** temp_sccAdjList = new __int64*[numVertices];
+
+    for (__int64 i = 0; i < numVertices; i++) {
+        
+        temp_sccAdjList_top[i] = -1;
+        temp_sccAdjList_cap[i] = 16;
+        
+        temp_sccAdjList[i] = simp_stack_create(&(temp_sccAdjList_top[i]), &(temp_sccAdjList_cap[i]));
+    }
+
+    for (__int64 i = 0; i < numVertices; i++) {
+
+        *(sccAdjList_cap[i]) = 16;
+        *(sccAdjList_top[i]) = -1;
+        sccAdjList_cap[i] = simp_stack_create(&(*(sccAdjList_top[i])), &(*(sccAdjList_cap[i])));
     }
 
     //Run strong connect starting from each vertex
-    for (var i = 0; i < numVertices; ++i) {
+    for (__int64 i = 0; i < numVertices; i++) {
+
         if (index[i] < 0) {
-            strongConnect(i)
+
+            __int64 v = i;
+
+            __int64 S_cap = 16;
+            __int64 S_top = -1;
+            __int64* S = simp_stack_create(&S_top, &S_cap);
+            simp_stack_push(&S, &S_top, &S_cap, v);
+            __int64 T_cap = 16;
+            __int64 T_top = -1;
+            __int64* T = simp_stack_create(&T_top, &T_cap);
+            simp_stack_push(&T, &T_top, &T_cap, v);
+
+            index[v] = lowValue[v] = count;
+            active[v] = true;
+            count += 1;
+
+            while (T_top >= 0) {
+                v = T[T_top];
+                __int64 e_len = adjList_len[v];
+                __int64* e = new __int64[e_len];
+                for (__int64 j = 0; j < e_len; j++)
+                    e[j] = adjList[v][j];
+                if (child[v] < e_len) { // If we're not done iterating over the children, first try finishing that.
+                    for (__int64 j = child[v]; j < e_len; j++) { // Start where we left off.
+                        __int64 u = e[j];
+                        if (index[u] < 0) {
+                            index[u] = lowValue[u] = count;
+                            active[u] = true;
+                            count += 1;
+                            simp_stack_push(&S, &S_top, &S_cap, u);
+                            simp_stack_push(&T, &T_top, &T_cap, u);
+                            break; // First recurse, then continue here (with the same child!).
+                            // There is a slight change to Tarjan's algorithm here.
+                            // Normally, after having recursed, we set lowValue like we do for an active child (although some variants of the algorithm do it slightly differently).
+                            // Here, we only do so if the child we recursed on is still active.
+                            // The reasoning is that if it is no longer active, it must have had a lowValue equal to its own index, which means that it is necessarily higher than our lowValue.
+                        }
+                        else if (active[u])
+                            lowValue[v] = (lowValue[v] < lowValue[u] ? lowValue[v] : lowValue[u]) | 0;
+                        if (scc[u] >= 0)
+                            simp_stack_push(&(sccLinks[v]), &(sccLinks_top[v]), &(sccLinks_cap[v]), scc[u]);
+                        // Node v is not yet assigned an scc, but once it is that scc can apparently reach scc[u]
+                        child[v] = j; // Remember where we left off.
+                    }
+                }
+                else { // If we're done iterating over the children, check whether we have an scc.
+                    if (lowValue[v] == index[v]) { // TODO: It /might/ be true that T is always a prefix of S (at this point!!!), and if so, this could be used here.
+
+                        __int64 component_cap = 16;
+                        __int64 component_top = -1;
+                        __int64* component = simp_stack_create(&component_top, &component_cap);
+
+                        __int64* links_cap = new __int64[S_top + 1];
+                        __int64* links_top = new __int64[S_top + 1];
+                        __int64** links = new __int64* [S_top + 1];
+
+                        for (_int64 j = 0; j < S_top + 1; j++) {
+                            links_cap[j] = 16;
+                            links_top[j] = -1;
+                            links[i] = simp_stack_create(&(links_top[j]), &(links_cap[j]));
+                        }
+
+                        __int64 linkCount = 0;
+                        for (__int64 j = S_top; j >= 0; j--) {
+                            __int64 w = S[i];
+                            active[w] = false;
+                            simp_stack_push(&component, &component_top, &component_cap, w);
+
+                            for (__int64 k = 0; k < sccLinks_top[w] + 1; k++)
+                                simp_stack_push(&(links[k]), &(links_top[v]), &(links_cap[v]), sccLinks[w][k]);
+
+                            linkCount += sccLinks_top[w] + 1;
+                            scc[w] = *(components_top[v]) + 1;
+                            if (w == v) {
+                                S_top = j - 1;
+                                break;
+                            }
+                        }
+                        for (__int64 j = 0; j < component_top + 1; j++)
+                            simp_stack_push(&(*(components[v])), &(*(components_top[v])), &(*(components_cap[v])), component[j]);
+
+                        __int64* allLinks = new __int64[linkCount];
+
+                        __int64 tempLinkCount = linkCount;
+
+                        for (__int64 j = 0; j < S_top + 1; j++) {
+                            for (__int64 k = 0; k < links_top[i] + 1; k++) {
+                                tempLinkCount--;
+                                allLinks[tempLinkCount] = links[j][k];
+                            }
+                        }
+
+                        for (__int64 j = 0; j < linkCount; j++)
+                            simp_stack_push(&(temp_sccAdjList[v]), &(temp_sccAdjList_top[v]), &(temp_sccAdjList_cap[v]), allLinks[j]);
+
+                        simp_stack_pop(T, &T_top, T_cap); // Now we're finished exploring this particular node (normally corresponds to the return statement)
+                    }
+
+                }
+            }
         }
     }
 
     // Compact sccAdjList
-    var newE
-        for (var i = 0; i < sccAdjList.length; i++) {
-            var e = sccAdjList[i]
-                if (e.length == = 0) continue
-                    e.sort(function(a, b) { return a - b; })
-                    newE = [e[0]]
-                    for (var j = 1; j < e.length; j++) {
-                        if (e[j] != = e[j - 1]) {
-                            newE.push(e[j])
-                        }
-                    }
-            sccAdjList[i] = newE
-        }
 
-    return { components: components, adjacencyList : sccAdjList }
+    __int64 newE_top = -1;
+    __int64 newE_cap = 16;
+    __int64* newE = simp_stack_create(&newE_top, &newE_cap);
+
+    for (__int64 i = 0; i < numVertices; i++) {
+
+        if (temp_sccAdjList_top[i] + 1 == 0)
+            continue;
+
+        __int64* e = new __int64[temp_sccAdjList_top[i] + 1];
+
+        for (__int64 j = 0; j < temp_sccAdjList_top[i] + 1; j++)
+            e[j] = temp_sccAdjList[i][j];
+
+        MyQSort(e, 0, temp_sccAdjList_top[i]);
+
+        simp_stack_push(&newE, &newE_top, &newE_cap, e[0]);
+                
+        for (__int64 j = 1; j < temp_sccAdjList_top[i] + 1; j++)
+            if (e[j] != e[j - 1])
+                simp_stack_push(&newE, &newE_top, &newE_cap, e[j]);
+
+        *(sccAdjList[i]) = newE;
+        *(sccAdjList_top[i]) = newE_top;
+        *(sccAdjList_cap[i]) = newE_cap;
+    }
 }
 
 // https://github.com/mikolalysenko/binary-search-bounds/blob/master/search-bounds.js
