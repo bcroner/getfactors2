@@ -369,7 +369,7 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
                 trues[encoding[i]] = true;
         }
 
-        for (__int64 i = n - 1; i >= ix; i--)
+        for (__int64 i = ix; i < n; i++)
             if (Z[i])
                 trues[i] = true;
             else
