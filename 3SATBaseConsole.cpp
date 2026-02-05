@@ -371,6 +371,12 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
                 trues[i] = true;
         }
 
+        for (__int64 i = n - 1; i >= ix; i--)
+            if (Z[i])
+                trues[i] = true;
+            else
+                falses[i] = true;
+
         for (__int64 i = 0; i < k_parm; i++) {
 
             if (lst_l[i] != FALSE_3SAT && lst_r[i] != FALSE_3SAT)
