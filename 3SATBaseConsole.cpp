@@ -689,8 +689,33 @@ bool solve2Sat(__int64 numVariables, __int64* clauses_l, __int64* clauses_r, __i
 
             __int64 v = cc[j];
                     
-            if (v < numVariables && contains(cc, scc_top[i], numVariables + v))
+            if (v < numVariables && contains(cc, scc_top[i], numVariables + v)) {
+
+                // clean up
+
+                for (__int64 k = 0; k < 2 * numVariables; k++)
+                    delete[] adj[k];
+
+                delete[] adj_top;
+                delete[] adj_cap;
+                delete[] adj;
+
+                for (__int64 k = 0; k < numVariables; k++)
+                    delete[] scc[k];
+
+                delete[] scc_top;
+                delete[] scc_cap;
+                delete[] scc;
+
+                for (__int64 k = 0; k < numVariables; k++)
+                    delete[] sccAdjList[k];
+
+                delete[] sccAdjList_top;
+                delete[] sccAdjList_cap;
+                delete[] sccAdjList;
+
                 return false;
+            }
 
             __int64 s = solution[v];
 
@@ -725,6 +750,29 @@ bool solve2Sat(__int64 numVariables, __int64* clauses_l, __int64* clauses_r, __i
                 solution[e[k]] = 1;
         }
     }
+
+    // clean up
+
+    for (__int64 k = 0; k < 2 * numVariables; k++)
+        delete[] adj[k];
+
+    delete[] adj_top;
+    delete[] adj_cap;
+    delete[] adj;
+
+    for (__int64 k = 0; k < numVariables; k++)
+        delete[] scc[k];
+
+    delete[] scc_top;
+    delete[] scc_cap;
+    delete[] scc;
+
+    for (__int64 k = 0; k < numVariables; k++)
+        delete[] sccAdjList[k];
+
+    delete[] sccAdjList_top;
+    delete[] sccAdjList_cap;
+    delete[] sccAdjList;
 
     return true;
 }
