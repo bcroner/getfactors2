@@ -249,9 +249,7 @@ bool bool_equals(bool* A, bool* B, __int64 n) {
 }
 
 
-bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n_parm, __int64 * is_f, __int64 * is_t) {
-
-    bool is_sat = false;
+bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n_parm, bool * is_f, bool * is_t) {
 
     __int64 counter = 2;
 
@@ -489,9 +487,6 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
     bool* always_f = new bool[s->n];
     bool* always_t = new bool[s->n];
 
-    bool* is_f = new bool[s->n];
-    bool* is_t = new bool[s->n];
-
     for (__int64 i = 0; i < s->n; i++) {
         always_f[i] = false;
         always_t[i] = false;
@@ -520,14 +515,10 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
 
         __int64 val_abs = val < 0 ? -val : val;
 
-        if (val < 0) {
+        if (val < 0)
             always_f[val_abs] = true;
-            is_f[val_abs] = true;
-        }
-        else {
+        else
             always_t[val_abs] = true;
-            is_t[val_abs] = true;
-        }
 
     }
     __int64 ix = s->n - 1 - s->chops;
@@ -536,8 +527,6 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
         if ((s->Z[i] && always_f[i]) || (!s->Z[i] && always_t[i])) {
             delete[] always_f;
             delete[] always_t;
-            delete[] is_t;
-            delete[] is_f;
             return false;
         }
 
@@ -554,10 +543,10 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
 
     bool is_sat = false;
 
-    while (true) {
+    bool* is_f = new bool[s->n];
+    bool* is_t = new bool[s->n];
 
-        bool* is_f = new bool[s->n];
-        bool* is_t = new bool[s->n];
+    while (true) {
 
         for (__int64 i = 0; i < s->n; i++) {
 
