@@ -12,41 +12,6 @@
 #define MVAL 1
 #define RVAL 2
 
-bool* simp_bool_vector_create(__int64 init_sz) {
-
-    bool* ret = new bool[init_sz];
-    return ret;
-
-}
-
-bool simp_bool_vector_read(bool* v, __int64 vtop, __int64 vcap, __int64 loc) {
-
-    if (loc > vtop)
-        return 0;
-
-    return v[loc];
-}
-
-void simp_bool_vector_append(bool** v, __int64* vtop, __int64* vcap, bool data) {
-
-    *vtop = *vtop + 1;
-
-    if (*vtop < *vcap)
-        (*v)[*vtop] = data;
-    else {
-        bool* newv = new bool[*vcap * 2];
-        for (__int64 i = 0; i < *vcap * 2; i++)
-            newv[i] = 0;
-        for (__int64 i = 0; i < *vcap; i++)
-            newv[i] = *v[i];
-        *vcap = *vcap * 2;
-        delete[] * v;
-        *v = newv;
-        *v[*vtop] = data;
-    }
-}
-
-
 __int64* simp_vector_create(__int64 init_sz) {
 
     __int64* ret = new __int64[init_sz];
@@ -81,32 +46,6 @@ void simp_vector_append(__int64** v, __int64* vtop, __int64* vcap, __int64 data)
     }
 
 }
-
-__int64* simp_stack_create(__int64* vtop, __int64 *vcap) {
-
-    *vtop = -1;
-    *vcap = 16;
-    return simp_vector_create(*vcap);
-
-}
-
-__int64 simp_stack_pop(__int64* s, __int64* vtop, __int64 vcap) {
-
-    if (*vtop == -1)
-        return 0;
-    else {
-        *vtop = *vtop - 1;
-        return simp_vector_read(s, *vtop, vcap, *vtop + 1);
-    }
-}
-
-void simp_stack_push(__int64** s, __int64* vtop, __int64* vcap, __int64 data) {
-
-    simp_vector_append(s, vtop, vcap, data);
-    *vtop = *vtop + 1;
-
-}
-
 
 bool* SATSolver_create_boundary(bool begin, __int64 chop, __int64 offs, __int64 n) {
 
@@ -309,479 +248,12 @@ bool bool_equals(bool* A, bool* B, __int64 n) {
     return true;
 }
 
-// https://www.geeksforgeeks.org/c-program-for-iterative-quick-sort/
 
-/* This function is same in both iterative and recursive*/
-__int64 partition(__int64 arr_parm[], __int64 low_parm, __int64 high_parm)
-{
-    __int64 pivot = arr_parm[high_parm];    // pivot
-    __int64 i = (low_parm - 1);  // Index of smaller element
-
-    for (__int64 j = low_parm; j <= high_parm - 1; j++)
-    {
-        // swap if current element is greater than pivot
-        if (arr_parm[j] > pivot)
-        {
-            i++;    // increment index of smaller element
-            __int64 t = arr_parm[i];
-            arr_parm[i] = arr_parm[j];
-            arr_parm[j] = t;
-        }
-    }
-    __int64 t = arr_parm[i + 1];
-    arr_parm[i + 1] = arr_parm[high_parm];
-    arr_parm[high_parm] = t;
-    return (i + 1);
-}
-
-/* A[] --> Array to be sorted,
-   l  --> Starting index,
-   h  --> Ending index */
-void MyQSort(__int64 arr[], __int64 l, __int64 h)
-{
-    // Create an auxiliary stack
-    __int64* stack = new __int64[h - l + 1];
-
-    // initialize top of stack
-    __int64 top = -1;
-
-    // push initial values of l and h to stack
-    stack[++top] = l;
-    stack[++top] = h;
-
-    // Keep popping from stack while is not empty
-    while (top >= 0) {
-        // Pop h and l
-        h = stack[top--];
-        l = stack[top--];
-
-        // Set pivot element at its correct position
-        // in sorted array
-        __int64 p = partition(arr, l, h);
-
-        // If there are elements on left side of pivot,
-        // then push left side to stack
-        if (p - 1 > l) {
-            stack[++top] = l;
-            stack[++top] = p - 1;
-        }
-
-        // If there are elements on right side of pivot,
-        // then push right side to stack
-        if (p + 1 < h) {
-            stack[++top] = p + 1;
-            stack[++top] = h;
-        }
-    }
-
-    delete[] stack;
-}
-
-
-// https://github.com/mikolalysenko/strongly-connected-components/blob/master/scc.js
-
-void stronglyConnectedComponents(__int64** adjList, __int64* adjList_top, __int64 numVertices, __int64 ***components, __int64** components_top, __int64** components_cap, __int64 ***sccAdjList, __int64** sccAdjList_top, __int64** sccAdjList_cap) {
-
-    __int64* index = new __int64[numVertices];
-    __int64* lowValue = new __int64[numVertices];
-    bool* active = new bool[numVertices];
-    __int64* child = new __int64[numVertices];
-
-    __int64* scc = new __int64[numVertices];
-
-    __int64* sccLinks_top = new __int64[numVertices];
-    __int64* sccLinks_cap = new __int64[numVertices];
-    __int64** sccLinks = new __int64* [numVertices];
-
-    for (__int64 i = 0; i < numVertices; i++) {
-
-        sccLinks_top[i] = -1;
-        sccLinks_cap[i] = 16;
-        sccLinks[i] = simp_stack_create(&(sccLinks_top[i]), &(sccLinks_cap[i]));
-    }
-
-    //Initialize tables
-    for (__int64 i = 0; i < numVertices; ++i) {
-        index[i] = -1;
-        lowValue[i] = 0;
-        active[i] = false;
-        child[i] = 0;
-        scc[i] = -1;
-        sccLinks[i] = simp_stack_create(&(sccLinks_top[i]), &(sccLinks_cap[i]));
-    }
-
-    // The strongConnect function
-    __int64 count = 0;
-    *components_cap = new __int64[numVertices];
-    *components_top = new __int64[numVertices];
-
-    for (__int64 i = 0; i < numVertices; i++) {
-
-        *(components_cap[i]) = 16;
-        *(components_top[i]) = -1;
-        *(components[i]) = simp_stack_create(&(*(components_cap[i])), &(*(components_top[i])));
-    }
-
-    __int64* temp_sccAdjList_top = new __int64[numVertices];
-    __int64* temp_sccAdjList_cap = new __int64[numVertices];
-    __int64** temp_sccAdjList = new __int64*[numVertices];
-
-    for (__int64 i = 0; i < numVertices; i++) {
-        
-        temp_sccAdjList_top[i] = -1;
-        temp_sccAdjList_cap[i] = 16;
-        
-        temp_sccAdjList[i] = simp_stack_create(&(temp_sccAdjList_top[i]), &(temp_sccAdjList_cap[i]));
-    }
-
-    for (__int64 i = 0; i < numVertices; i++) {
-
-        *(sccAdjList_cap[i]) = 16;
-        *(sccAdjList_top[i]) = -1;
-        *(sccAdjList[i]) = simp_stack_create(&(*(sccAdjList_top[i])), &(*(sccAdjList_cap[i])));
-    }
-
-    //Run strong connect starting from each vertex
-    for (__int64 i = 0; i < numVertices; i++) {
-
-        if (index[i] < 0) {
-
-            __int64 v = i;
-
-            __int64 S_cap = 16;
-            __int64 S_top = -1;
-            __int64* S = simp_stack_create(&S_top, &S_cap);
-            simp_stack_push(&S, &S_top, &S_cap, v);
-            __int64 T_cap = 16;
-            __int64 T_top = -1;
-            __int64* T = simp_stack_create(&T_top, &T_cap);
-            simp_stack_push(&T, &T_top, &T_cap, v);
-
-            index[v] = lowValue[v] = count;
-            active[v] = true;
-            count += 1;
-
-            while (T_top >= 0) {
-                v = T[T_top];
-                __int64 e_len = adjList_top[v] + 1;
-                __int64* e = new __int64[e_len];
-                for (__int64 j = 0; j < e_len; j++)
-                    e[j] = adjList[v][j];
-                if (child[v] < e_len) { // If we're not done iterating over the children, first try finishing that.
-                    for (__int64 j = child[v]; j < e_len; j++) { // Start where we left off.
-                        __int64 u = e[j];
-                        if (index[u] < 0) {
-                            index[u] = lowValue[u] = count;
-                            active[u] = true;
-                            count += 1;
-                            simp_stack_push(&S, &S_top, &S_cap, u);
-                            simp_stack_push(&T, &T_top, &T_cap, u);
-                            break; // First recurse, then continue here (with the same child!).
-                            // There is a slight change to Tarjan's algorithm here.
-                            // Normally, after having recursed, we set lowValue like we do for an active child (although some variants of the algorithm do it slightly differently).
-                            // Here, we only do so if the child we recursed on is still active.
-                            // The reasoning is that if it is no longer active, it must have had a lowValue equal to its own index, which means that it is necessarily higher than our lowValue.
-                        }
-                        else if (active[u])
-                            lowValue[v] = (lowValue[v] < lowValue[u] ? lowValue[v] : lowValue[u]) | 0;
-                        if (scc[u] >= 0)
-                            simp_stack_push(&(sccLinks[v]), &(sccLinks_top[v]), &(sccLinks_cap[v]), scc[u]);
-                        // Node v is not yet assigned an scc, but once it is that scc can apparently reach scc[u]
-                        child[v] = j; // Remember where we left off.
-                    }
-                }
-                else { // If we're done iterating over the children, check whether we have an scc.
-                    if (lowValue[v] == index[v]) { // TODO: It /might/ be true that T is always a prefix of S (at this point!!!), and if so, this could be used here.
-
-                        __int64 component_cap = 16;
-                        __int64 component_top = -1;
-                        __int64* component = simp_stack_create(&component_top, &component_cap);
-
-                        __int64* links_cap = new __int64[S_top + 1];
-                        __int64* links_top = new __int64[S_top + 1];
-                        __int64** links = new __int64* [S_top + 1];
-
-                        for (_int64 j = 0; j < S_top + 1; j++) {
-                            links_cap[j] = 16;
-                            links_top[j] = -1;
-                            links[i] = simp_stack_create(&(links_top[j]), &(links_cap[j]));
-                        }
-
-                        __int64 linkCount = 0;
-                        for (__int64 j = S_top; j >= 0; j--) {
-                            __int64 w = S[i];
-                            active[w] = false;
-                            simp_stack_push(&component, &component_top, &component_cap, w);
-
-                            for (__int64 k = 0; k < sccLinks_top[w] + 1; k++)
-                                simp_stack_push(&(links[k]), &(links_top[v]), &(links_cap[v]), sccLinks[w][k]);
-
-                            linkCount += sccLinks_top[w] + 1;
-                            scc[w] = *(components_top[v]) + 1;
-                            if (w == v) {
-                                S_top = j - 1;
-                                break;
-                            }
-                        }
-                        for (__int64 j = 0; j < component_top + 1; j++)
-                            simp_stack_push(&(*(components[v])), &(*(components_top[v])), &(*(components_cap[v])), component[j]);
-
-                        __int64* allLinks = new __int64[linkCount];
-
-                        __int64 tempLinkCount = linkCount;
-
-                        for (__int64 j = 0; j < S_top + 1; j++) {
-                            for (__int64 k = 0; k < links_top[i] + 1; k++) {
-                                tempLinkCount--;
-                                allLinks[tempLinkCount] = links[j][k];
-                            }
-                        }
-
-                        for (__int64 j = 0; j < linkCount; j++)
-                            simp_stack_push(&(temp_sccAdjList[v]), &(temp_sccAdjList_top[v]), &(temp_sccAdjList_cap[v]), allLinks[j]);
-
-                        simp_stack_pop(T, &T_top, T_cap); // Now we're finished exploring this particular node (normally corresponds to the return statement)
-
-                        // clean up
-
-                        for (__int64 j = 0; j < S_top + 1; j++)
-                            delete[] links[j];
-
-                        delete[] links_cap;
-                        delete[] links_top;
-                        delete[] links;
-                    }
-
-                }
-            }
-        }
-    }
-
-    // Compact sccAdjList
-
-    for (__int64 i = 0; i < numVertices; i++) {
-
-        if (temp_sccAdjList_top[i] + 1 == 0)
-            continue;
-
-        __int64 newE_top = -1;
-        __int64 newE_cap = 16;
-        __int64* newE = simp_stack_create(&newE_top, &newE_cap);
-
-        __int64* e = new __int64[temp_sccAdjList_top[i] + 1];
-
-        for (__int64 j = 0; j < temp_sccAdjList_top[i] + 1; j++)
-            e[j] = temp_sccAdjList[i][j];
-
-        MyQSort(e, 0, temp_sccAdjList_top[i]);
-
-        simp_stack_push(&newE, &newE_top, &newE_cap, e[0]);
-                
-        for (__int64 j = 1; j < temp_sccAdjList_top[i] + 1; j++)
-            if (e[j] != e[j - 1])
-                simp_stack_push(&newE, &newE_top, &newE_cap, e[j]);
-
-        *(sccAdjList[i]) = newE;
-        *(sccAdjList_top[i]) = newE_top;
-        *(sccAdjList_cap[i]) = newE_cap;
-    }
-
-    // clean up
-
-    for (__int64 i = 0; i < numVertices; i++)
-        delete[] sccLinks[i];
-
-    delete[] sccLinks_top;
-    delete[] sccLinks_cap;
-    delete[] sccLinks;
-
-    for (__int64 i = 0; i < numVertices; i++)
-        delete[] temp_sccAdjList[i];
-
-    delete[] temp_sccAdjList_top;
-    delete[] temp_sccAdjList_cap;
-    delete[] temp_sccAdjList;
-
-}
-
-// https://github.com/mikolalysenko/2-sat/blob/master/2sat.js
-
-__int64 clauseToVariable (__int64 x, __int64 n) {
-
-    if (x < 0)
-        return (-1 - x) + n;
-    else
-        return x - 1;
-}
-
-__int64 negate (__int64 x, __int64 n) {
-
-    if (x < n)
-        return x + n;
-    else
-        return x - n;
-}
-
-bool contains (__int64* cc, __int64 cc_top, __int64 v) {
-
-    for (__int64 i = 0; i < cc_top + 1; i++)
-        if (cc[i] == v)
-            return true;
-
-    return false;
-}
-
-bool solve2Sat(__int64 numVariables, __int64* clauses_l, __int64* clauses_r, __int64 k) {
-
-    //Build implication graph
-    __int64* adj_top = new __int64[2 * numVariables];
-    __int64* adj_cap = new __int64[2 * numVariables];
-    __int64** adj = new __int64* [2 * numVariables];
-
-    for (__int64 i = 0; i < 2 * numVariables; ++i) {
-
-        adj_top[i] = -1;
-        adj_cap[i] = 16;
-        adj[i] = simp_stack_create(&(adj_top[i]), &(adj_cap[i]));
-    }
-
-    for (__int64 i = 0; i < k; i++) {
-
-        __int64 a = clauseToVariable(clauses_l[i], numVariables);
-        __int64 b = clauseToVariable(clauses_r[i], numVariables);
-        __int64 na = negate(a, numVariables);
-        simp_stack_push(&(adj[na]), &(adj_top[na]), &(adj_cap[na]), b);
-        __int64 nb = negate(b, numVariables);
-        simp_stack_push(&(adj[nb]), &(adj_top[nb]), &(adj_cap[nb]), a);
-    }
-
-    //Extract strongly connected components
-
-    __int64* scc_top;
-    __int64* scc_cap;
-    __int64** scc;
-
-    __int64* sccAdjList_top;
-    __int64* sccAdjList_cap;
-    __int64** sccAdjList;
-
-    stronglyConnectedComponents(adj, adj_top, numVariables, &scc, &scc_top, &scc_cap, &sccAdjList, &sccAdjList_top, &sccAdjList_cap);
-    
-        //Mark cells and check satisfiability
-    __int64* solution = new __int64[2 * numVariables];
-
-    for (__int64 i = 0; i < 2 * numVariables; i++)
-        solution[i] = -1;
-
-    for (__int64 i = 0; i < numVariables; i++) {
-
-        __int64* cc = new __int64[scc_top[i] + 1];
-
-        for (__int64 j = 0; j < scc_top[i] + 1; j++)
-            cc[j] = scc[i][j];
-            
-        MyQSort(cc, 0, scc_top[i]);
-
-            //Visit all nodes in queue
-        __int64 color = 0;
-       
-        for (__int64 j = 0; j < scc_top[i] + 1; j++) {
-
-            __int64 v = cc[j];
-                    
-            if (v < numVariables && contains(cc, scc_top[i], numVariables + v)) {
-
-                // clean up
-
-                for (__int64 k = 0; k < 2 * numVariables; k++)
-                    delete[] adj[k];
-
-                delete[] adj_top;
-                delete[] adj_cap;
-                delete[] adj;
-
-                for (__int64 k = 0; k < numVariables; k++)
-                    delete[] scc[k];
-
-                delete[] scc_top;
-                delete[] scc_cap;
-                delete[] scc;
-
-                for (__int64 k = 0; k < numVariables; k++)
-                    delete[] sccAdjList[k];
-
-                delete[] sccAdjList_top;
-                delete[] sccAdjList_cap;
-                delete[] sccAdjList;
-
-                return false;
-            }
-
-            __int64 s = solution[v];
-
-            if (s >= 0)
-                color = s;
-        }
-
-        //Update solution in component
-        for (__int64 j = 0; j < scc_top[i] + 1; j++) {
-
-            __int64 v = cc[j];
-            __int64 nv = negate(v, numVariables);
-            solution[v] = color;
-            solution[nv] = color ^ 1;
-
-            __int64 e_len;
-            __int64* e;
-            if (color) {
-                e_len = adj_top[v] + 1;
-                e = new __int64[e_len];
-                for (__int64 k = 0; k < e_len; k++)
-                    e[k] = adj[v][k];
-            }
-            else {
-                e_len = adj_top[nv] + 1;
-                e = new __int64[e_len];
-                for (__int64 k = 0; k < e_len; k++)
-                    e[k] = adj[nv][k];
-            }
-
-            for (__int64 k = 0; k < e_len; ++k)
-                solution[e[k]] = 1;
-        }
-    }
-
-    // clean up
-
-    for (__int64 k = 0; k < 2 * numVariables; k++)
-        delete[] adj[k];
-
-    delete[] adj_top;
-    delete[] adj_cap;
-    delete[] adj;
-
-    for (__int64 k = 0; k < numVariables; k++)
-        delete[] scc[k];
-
-    delete[] scc_top;
-    delete[] scc_cap;
-    delete[] scc;
-
-    for (__int64 k = 0; k < numVariables; k++)
-        delete[] sccAdjList[k];
-
-    delete[] sccAdjList_top;
-    delete[] sccAdjList_cap;
-    delete[] sccAdjList;
-
-    return true;
-}
-
-bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n_parm) {
+bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n_parm, __int64 * is_f, __int64 * is_t) {
 
     bool is_sat = false;
 
-    __int64 counter = 1;
+    __int64 counter = 2;
 
     __int64* encoding = new __int64[n_parm]; // from 2..n_parm to 2..n
     __int64* decoding = new __int64[n_parm]; // from 2..n to 2..n_parm
@@ -805,7 +277,7 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
         used[r_abs] = true;
     }
 
-    __int64 n = 0;
+    __int64 n = 1;
 
     for (__int64 i = 2; i < n_parm; i++)
         if (used[i])
@@ -840,9 +312,157 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
         counter_k++;
     }
 
-    bool is_sat = solve2Sat(n, lst_l, lst_r, k_parm);
+    __int64* false_implies_top = new __int64[n];
+    __int64* false_implies_cap = new __int64[n];
+    __int64** false_implies = new __int64* [n];
+    __int64* true_implies_top = new __int64[n];
+    __int64* true_implies_cap = new __int64[n];
+    __int64** true_implies = new __int64* [n];
+
+    for (__int64 i = 0; i < n; i++) {
+        false_implies_top[i] = -1;
+        false_implies_cap[i] = 16;
+        false_implies[i] = simp_vector_create(false_implies_cap[i]);
+        true_implies_top[i] = -1;
+        true_implies_cap[i] = 16;
+        true_implies[i] = simp_vector_create(true_implies_cap[i]);
+    }
+
+    for (__int64 i = 0; i < k_parm; i++) {
+
+        if (lst_l[i] == FALSE_3SAT || lst_r[i] == FALSE_3SAT)
+            continue;
+
+        __int64 l_abs = lst_l[i] < 0 ? -lst_l[i] : lst_l[i];
+        __int64 r_abs = lst_r[i] < 0 ? -lst_r[i] : lst_r[i];
+
+        if (lst_l[i] < 0)
+            simp_vector_append(&(true_implies[i]), &(true_implies_top[i]), &(true_implies_cap[i]), lst_r[i]);
+        else
+            simp_vector_append(&(false_implies[i]), &(false_implies_top[i]), &(false_implies_cap[i]), lst_r[i]);
+
+        if (lst_r[i] < 0)
+            simp_vector_append(&(true_implies[i]), &(true_implies_top[i]), &(true_implies_cap[i]), lst_l[i]);
+        else
+            simp_vector_append(&(false_implies[i]), &(false_implies_top[i]), &(false_implies_cap[i]), lst_l[i]);
+            
+    }
+
+    bool is_sat = false;
+    __int64 ix = n - 1;
+    bool* Z = new bool[n];
+    for (__int64 i = 0; i < n; i++)
+        Z[i] = false;
+
+    while (true) {
+
+        bool* falses = new bool[n];
+        bool* trues = new bool[n];
+
+        for (__int64 i = 0; i < n; i++) {
+            falses[i] = false;
+            trues[i] = false;
+        }
+
+        for (__int64 i = 0; i < n; i++) {
+            if (is_f[i])
+                falses[i] = true;
+            if (is_t[i])
+                trues[i] = true;
+        }
+
+        for (__int64 i = 0; i < k_parm; i++) {
+
+            if (lst_l[i] != FALSE_3SAT && lst_r[i] != FALSE_3SAT)
+                continue;
+
+            __int64 val = lst_l[i] == FALSE_3SAT ? lst_r[i] : lst_l[i];
+            __int64 val_abs = val < 0 ? -val : val;
+
+            if (val < 0)
+                falses[val_abs] = true;
+            else
+                trues[val_abs] = true;
+        }
+
+        for (__int64 i = n - 1; i >= ix; i--)
+            if (Z[i]) {
+                for (__int64 j = 0; j < true_implies_top[i] + 1; j++) {
+
+                    __int64 val = true_implies[i][j];
+                    __int64 val_abs = val < 0 ? -val : val;
+
+                    if (val < 0)
+                        falses[val_abs] = true;
+                    else
+                        trues[val_abs] = true;
+                }
+            }
+            else
+                for(__int64 j = 0; j < false_implies_top[i] + 1; j++) {
+
+                __int64 val = false_implies[i][j];
+                __int64 val_abs = val < 0 ? -val : val;
+
+                if (val < 0)
+                    falses[val_abs] = true;
+                else
+                    trues[val_abs] = true;
+            }
+            
+        bool contradiction = false;
+
+        for (__int64 i = 2; i < n; i++)
+            if (trues[i] && falses[i]) {
+                contradiction = true;
+                break;
+            }
+
+        if (!contradiction && ix == 2) {
+            is_sat = true;
+            break;
+        }
+        else if (!contradiction)
+            ix--;
+        else if (contradiction) {
+
+            while (ix < n )
+                if (Z[ix]) {
+                    Z[ix] = false;
+                    ix++;
+                }
+                else {
+                    Z[ix] = true;
+                    break;
+                }
+
+            for (__int64 i = ix - 1; i >= 0; i--)
+                Z[i] = false;
+
+        }
+
+        if (ix >= n)
+            break;
+
+    }
 
     // clean up
+
+    delete[] Z;
+
+    for (__int64 i = 0; i < n; i++)
+        delete[] false_implies[i];
+
+    delete[] false_implies_top;
+    delete[] false_implies_cap;
+    delete[] false_implies;
+
+    for (__int64 i = 0; i < n; i++)
+        delete[] true_implies[i];
+
+    delete[] true_implies_top;
+    delete[] true_implies_cap;
+    delete[] true_implies;
 
     delete[] encoding;
     delete[] decoding;
@@ -927,6 +547,31 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
 
     while (true) {
 
+        bool* is_f = new bool[s->n];
+        bool* is_t = new bool[s->n];
+
+        for (__int64 i = 0; i < s->n; i++) {
+
+            is_f[i] = false;
+            is_t[i] = false;
+        }
+
+        for (__int64 i = 0; i < s->n; i++) {
+
+            if (always_f[i])
+                is_f[i] = true;
+            if (always_t[i])
+                is_t[i] = true;
+        }
+
+        for (__int64 i = 0; i < s->n; i++) {
+
+            if (s->Z[i])
+                is_t[i] = true;
+            if (!s->Z[i])
+                is_f[i] = true;
+        }
+
         __int64 size_2sat = count_always_f + count_always_t;
 
         for (__int64 i = s->n - 1; i >= ix; i--)
@@ -943,12 +588,12 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
         for (__int64 i = 2; i < s->n; i++) {
             if (always_f[i]) {
                 cd_2sat_l[cd_2sat_cur_sz_f] = i;
-                cd_2sat_r[cd_2sat_cur_sz_f] = i;
+                cd_2sat_r[cd_2sat_cur_sz_f] = FALSE_3SAT;
                 cd_2sat_cur_sz_f++;
             }
             if (always_t[i]) {
                 cd_2sat_l[cd_2sat_cur_sz_t] = i;
-                cd_2sat_r[cd_2sat_cur_sz_t] = i;
+                cd_2sat_r[cd_2sat_cur_sz_t] = FALSE_3SAT;
                 cd_2sat_cur_sz_t++;
             }
         }

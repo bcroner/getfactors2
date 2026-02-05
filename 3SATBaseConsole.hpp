@@ -43,26 +43,12 @@ typedef struct SATSolver_tag {
 
 } SATSolver;
 
-bool* simp_bool_vector_create(__int64 init_sz);
-bool simp_bool_vector_read(bool* v, __int64 vtop, __int64 vcap, __int64 loc);
-void simp_bool_vector_append(bool** v, __int64* vtop, __int64* vcap, bool data);
 __int64* simp_vector_create(__int64 init_sz);
 __int64 simp_vector_read(__int64* v, __int64 vtop, __int64 vcap, __int64 loc);
 void simp_vector_append(__int64** v, __int64* vtop, __int64* vcap, __int64 data);
-__int64* simp_stack_create(__int64* vtop, __int64* vcap);
-__int64 simp_stack_pop(__int64* s, __int64* vtop, __int64 vcap);
-void simp_stack_push(__int64** s, __int64* vtop, __int64* vcap, __int64 data);
-__int64 partition(__int64 arr_parm[], __int64 low_parm, __int64 high_parm);
-void MyQSort(__int64 arr[], __int64 l, __int64 h);
-void stronglyConnectedComponents(__int64** adjList, __int64* adjList_len, __int64 numVertices, __int64*** components, __int64** components_top, __int64** components_cap, __int64*** sccAdjList, __int64** sccAdjList_top, __int64** sccAdjList_cap);
-__int64 clauseToVariable(__int64 x, __int64 n);
-__int64 negate(__int64 x, __int64 n);
-bool contains(__int64* cc, __int64 cc_top, __int64 v);
-bool solve2Sat(__int64 numVariables, __int64* clauses_l, __int64* clauses_r, __int64 k) {
 bool* SATSolver_create_boundary(bool begin, __int64 chop, __int64 offs, __int64 n);
 void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n, __int64 chops, __int64 chop);
 void SATSolver_destroy(SATSolver* s);
-bool bool_equals(bool* A, bool* B, __int64 n);
 bool two_sat(__int64* lst_l_parm, __int64* lst_parm, __int64 k_parm, __int64 n_parm);
 bool SATSolver_isSat(SATSolver* s, bool* sln);
 
