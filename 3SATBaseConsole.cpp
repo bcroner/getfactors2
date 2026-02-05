@@ -93,10 +93,10 @@ void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n, __int64
         s->inopcell_m[i] = lst[i][1];
         s->inopcell_r[i] = lst[i][2];
 
-        printf_s("%lld: %lld %lld %lld\n", i, lst[i][0], lst[i][1], lst[i][2]);
+        //printf_s("%lld: %lld %lld %lld\n", i, lst[i][0], lst[i][1], lst[i][2]);
     }
 
-    printf_s("\n");
+    //printf_s("\n");
 
     s->cdopcelll_f = new __int64* [n];
     s->cdopcellr_f = new __int64* [n];
@@ -141,6 +141,12 @@ void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n, __int64
     }
 
     // place instance variables into encoding
+
+    s->cd_sizes_f[0] = 0;
+    s->cd_sizes_t[0] = 0;
+
+    s->cd_sizes_f[1] = 0;
+    s->cd_sizes_t[1] = 0;
 
     for (__int64 i = 2; i < n; i++) {
 
@@ -251,9 +257,11 @@ bool bool_equals(bool* A, bool* B, __int64 n) {
 
 bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n_parm, bool * is_f, bool * is_t) {
 
+    /*
     for (__int64 i = 0; i < k_parm; i++)
         printf_s("%lld: %lld %lld\n", i, lst_l_parm[i], lst_r_parm[i]);
     printf_s("\n");
+    //*/
 
     __int64 counter = 2;
 
@@ -276,7 +284,7 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
         used[r_abs] = true;
     }
 
-    __int64 n = 0;
+    __int64 n = 2;
 
     for (__int64 i = 2; i < n_parm; i++)
         if (used[i])
@@ -310,9 +318,11 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
         counter_k++;
     }
 
+    /*
     for (__int64 i = 0; i < k_parm; i++)
         printf_s("%lld: %lld %lld\n", i, lst_l[i], lst_r[i]);
     printf_s("\n");
+    //*/
 
     __int64* false_implies_top = new __int64[n];
     __int64* false_implies_cap = new __int64[n];
