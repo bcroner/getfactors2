@@ -380,7 +380,7 @@ void MyQSort(__int64 arr[], __int64 l, __int64 h)
 
 // https://github.com/mikolalysenko/strongly-connected-components/blob/master/scc.js
 
-void stronglyConnectedComponents(__int64** adjList, __int64* adjList_len, __int64 numVertices, __int64 ***components, __int64** components_top, __int64** components_cap, __int64 ***sccAdjList, __int64** sccAdjList_top, __int64** sccAdjList_cap) {
+void stronglyConnectedComponents(__int64** adjList, __int64* adjList_top, __int64 numVertices, __int64 ***components, __int64** components_top, __int64** components_cap, __int64 ***sccAdjList, __int64** sccAdjList_top, __int64** sccAdjList_cap) {
 
     __int64* index = new __int64[numVertices];
     __int64* lowValue = new __int64[numVertices];
@@ -463,7 +463,7 @@ void stronglyConnectedComponents(__int64** adjList, __int64* adjList_len, __int6
 
             while (T_top >= 0) {
                 v = T[T_top];
-                __int64 e_len = adjList_len[v];
+                __int64 e_len = adjList_top[v] + 1;
                 __int64* e = new __int64[e_len];
                 for (__int64 j = 0; j < e_len; j++)
                     e[j] = adjList[v][j];
@@ -578,114 +578,6 @@ void stronglyConnectedComponents(__int64** adjList, __int64* adjList_len, __int6
     }
 }
 
-// https://github.com/mikolalysenko/binary-search-bounds/blob/master/search-bounds.js
-
-__int64 ge (__int64 *a, __int64 y, c, __int64 l, __int64 h) {
-
-    __int64 i = h + 1;
-
-    while (l <= h) {
-
-        __int64 m = (l + h) >> 1;
-        __int64 x = a[m];
-        __int64 p = (c != undefined) ? c(x, y) : (x - y);
-
-        if (p >= 0) {
-            i = m;
-            h = m - 1;
-        }
-        else
-            l = m + 1;
-    }
-    return i;
-}
-
-__int64 gt (__int64 *a, __int64 y, c, __int64 l, __int64 h) {
-
-    __int64 i = h + 1;
-
-    while (l <= h) {
-
-        __int64 m = (l + h) >> 1;
-        __int64 x = a[m];
-        __int64 p = (c != undefined) ? c(x, y) : (x - y);
-
-        if (p > 0) {
-            i = m;
-            h = m - 1;
-        }
-        else
-            l = m + 1;
-    }
-    return i;
-}
-
-__int64 lt (__int64 *a, __int64 y, c, __int64 l, __int64 h) {
-
-    __int64 i = l - 1;
-
-    while (l <= h) {
-
-        __int64 m = (l + h) >> 1;
-        __int64 x = a[m];
-        __int64 p = (c != undefined) ? c(x, y) : (x - y);
-
-        if (p < 0) {
-            i = m;
-            l = m + 1;
-        }
-        else
-            h = m - 1;
-    }
-    return i;
-}
-
-__int64 le (__int64* a, __int64 y, c, __int64 l, __int64 h) {
-
-    __int64 i = l - 1;
-
-    while (l <= h) {
-
-        __int64 m = (l + h) >> 1;
-        __int64 x = a[m];
-        __int64 p = (c != undefined) ? c(x, y) : (x - y);
-
-        if (p <= 0) {
-            i = m;
-            l = m + 1;
-        }
-        else
-            h = m - 1;
-    }
-    return i;
-}
-
-__int64 eq (__int64 *a, __int64 y, c, __int64 l, __int64 h) {
-
-    while (l <= h) {
-
-        __int64 m = (l + h) >> 1;
-        __int64 x = a[m];
-        __int64 p = (c != = undefined) ? c(x, y) : (x - y);
-
-        if (p == 0)
-            return m;
-        if (p <= 0)
-            l = m + 1;
-        else
-            h = m - 1;
-    }
-    return -1;
-}
-
-__int64 norm (__int64* a, __int64 a_top, __int64 y, c, __int64 l, __int64 h, f) {
-
-    if (typeof c == 'function') {
-        return f(a, y, c, (l == undefined) ? 0 : l | 0, (h == undefined) ? a_top : h | 0);
-    }
-    return f(a, y, undefined, (c == undefined) ? 0 : c | 0, (l == undefined) ? a_top : l | 0);
-}
-
 // https://github.com/mikolalysenko/2-sat/blob/master/2sat.js
 
 __int64 clauseToVariable (__int64 x, __int64 n) {
@@ -702,11 +594,6 @@ __int64 negate (__int64 x, __int64 n) {
         return x + n;
     else
         return x - n;
-}
-
-__int64 compareInt (__int64 a, __int64 b) {
-
-    return a - b;
 }
 
 bool contains (__int64* cc, __int64 cc_top, __int64 v) {
@@ -743,47 +630,77 @@ bool solve2Sat(__int64 numVariables, __int64* clauses_l, __int64* clauses_r, __i
     }
 
     //Extract strongly connected components
-    var scc = stronglyConnectedComponents(adj).components
 
+    __int64* scc_top;
+    __int64* scc_cap;
+    __int64** scc;
+
+    __int64* sccAdjList_top;
+    __int64* sccAdjList_cap;
+    __int64** sccAdjList;
+
+    stronglyConnectedComponents(adj, adj_top, numVariables, &scc, &scc_top, &scc_cap, &sccAdjList, &sccAdjList_top, &sccAdjList_cap);
+    
         //Mark cells and check satisfiability
-        var solution = new Array(2 * numVariables)
-        for (var i = 0; i < solution.length; ++i) {
-            solution[i] = -1
-        }
+    __int64* solution = new __int64[2 * numVariables];
 
-    for (var i = 0; i < scc.length; ++i) {
-        var cc = scc[i]
-            cc.sort(compareInt)
+    for (__int64 i = 0; i < 2 * numVariables; i++)
+        solution[i] = -1;
+
+    for (__int64 i = 0; i < numVariables; i++) {
+
+        __int64* cc = new __int64[scc_top[i] + 1];
+
+        for (__int64 j = 0; j < scc_top[i] + 1; j++)
+            cc[j] = scc[i][j];
+            
+        MyQSort(cc, 0, scc_top[i]);
 
             //Visit all nodes in queue
-            var to_visit = []
-            var color = 0
-            for (var j = 0; j < cc.length; ++j) {
-                var v = cc[j]
-                    if (v < numVariables && contains(cc, numVariables + v)) {
-                        return false
-                    }
-                var s = solution[v]
-                    if (s >= 0) {
-                        color = s
-                    }
-            }
+        __int64 color = 0;
+       
+        for (__int64 j = 0; j < scc_top[i] + 1; j++) {
+
+            __int64 v = cc[j];
+                    
+            if (v < numVariables && contains(cc, scc_top[i], numVariables + v))
+                return false;
+
+            __int64 s = solution[v];
+
+            if (s >= 0)
+                color = s;
+        }
 
         //Update solution in component
-        for (var j = 0; j < cc.length; ++j) {
-            var v = cc[j]
-                var nv = negate(v, numVariables)
-                solution[v] = color
-                solution[nv] = color ^ 1
-                var e = color ? adj[v] : adj[nv]
-                for (var k = 0; k < e.length; ++k) {
-                    solution[e[k]] = 1
-                }
+        for (__int64 j = 0; j < scc_top[i] + 1; j++) {
+
+            __int64 v = cc[j];
+            __int64 nv = negate(v, numVariables);
+            solution[v] = color;
+            solution[nv] = color ^ 1;
+
+            __int64 e_len;
+            __int64* e;
+            if (color) {
+                e_len = adj_top[v] + 1;
+                e = new __int64[e_len];
+                for (__int64 k = 0; k < e_len; k++)
+                    e[k] = adj[v][k];
+            }
+            else {
+                e_len = adj_top[nv] + 1;
+                e = new __int64[e_len];
+                for (__int64 k = 0; k < e_len; k++)
+                    e[k] = adj[nv][k];
+            }
+
+            for (__int64 k = 0; k < e_len; ++k)
+                solution[e[k]] = 1;
         }
     }
 
-    solution.length = numVariables
-        return solution
+    return true;
 }
 
 bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n_parm) {
@@ -831,7 +748,7 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
     __int64* lst_l = new __int64[k_parm];
     __int64* lst_r = new __int64[k_parm];
 
-    for (__int64 i = 0; i < k; i++) {
+    for (__int64 i = 0; i < k_parm; i++) {
         lst_l[i] = 0;
         lst_r[i] = 0;
     }
@@ -849,6 +766,7 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
         counter_k++;
     }
 
+    bool is_sat = solve2Sat(n, lst_l, lst_r, k_parm);
 
     // clean up
 
