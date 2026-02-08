@@ -318,7 +318,7 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
         lst_r[i] = 0;
     }
 
-    __int64 counter_k = 0;
+    __int64 k = 0;
 
     for (__int64 i = 0; i < k_parm; i++) {
 
@@ -340,10 +340,10 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
             __int64 l_abs = lst_l_parm[i] < 0 ? -lst_l_parm[i] : lst_l_parm[i];
             __int64 r_abs = lst_r_parm[i] < 0 ? -lst_r_parm[i] : lst_r_parm[i];
 
-            lst_l[counter_k] = lst_l_parm[i] < 0 ? -encoding[l_abs] : encoding[l_abs];
-            lst_r[counter_k] = lst_r_parm[i] < 0 ? -encoding[r_abs] : encoding[r_abs];
+            lst_l[k] = lst_l_parm[i] < 0 ? -encoding[l_abs] : encoding[l_abs];
+            lst_r[k] = lst_r_parm[i] < 0 ? -encoding[r_abs] : encoding[r_abs];
 
-            counter_k++;
+            k++;
         }
     }
 
@@ -369,7 +369,7 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
         true_implies[i] = simp_vector_create(true_implies_cap[i]);
     }
 
-    for (__int64 i = 0; i < counter_k; i++) {
+    for (__int64 i = 0; i < k; i++) {
 
         __int64 l_abs = lst_l[i] < 0 ? -lst_l[i] : lst_l[i];
         __int64 r_abs = lst_r[i] < 0 ? -lst_r[i] : lst_r[i];
