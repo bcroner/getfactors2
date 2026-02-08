@@ -642,17 +642,19 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
 
         __int64 size_2sat = 0;
 
-        for (__int64 i = ix; i < s->n; i++)
+        for (__int64 i = ix; i < s->n; i++) {
             if (s->Z[i] || is_t[i])
                 size_2sat += s->cd_sizes_t[i];
-            else if (!s->Z[i] || is_f[i])
+            if (!s->Z[i] || is_f[i])
                 size_2sat += s->cd_sizes_f[i];
+        }
 
-        for (__int64 i = 2; i < ix; i++)
+        for (__int64 i = 2; i < ix; i++) {
             if (is_t[i])
                 size_2sat += s->cd_sizes_t[i];
-            else if (is_f[i])
+            if (is_f[i])
                 size_2sat += s->cd_sizes_f[i];
+        }
 
         __int64* cd_2sat_l = new __int64[size_2sat];
         __int64* cd_2sat_r = new __int64[size_2sat];
