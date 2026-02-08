@@ -322,13 +322,29 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
 
     for (__int64 i = 0; i < k_parm; i++) {
 
-        __int64 l_abs = lst_l_parm[i] < 0 ? -lst_l_parm[i] : lst_l_parm[i];
-        __int64 r_abs = lst_r_parm[i] < 0 ? -lst_r_parm[i] : lst_r_parm[i];
+        if (lst_l_parm[i] == FALSE_3SAT && lst_r_parm[i] == FALSE_3SAT)
+            continue;
+        else if (lst_l_parm[i] == FALSE_3SAT || lst_r_parm[i] == FALSE_3SAT) {
 
-        lst_l[counter_k] = lst_l_parm[i] < 0 ? -encoding[l_abs] : encoding[l_abs];
-        lst_r[counter_k] = lst_r_parm[i] < 0 ? -encoding[r_abs] : encoding[r_abs];
+            __int64 val = lst_l_parm[i] == FALSE_3SAT ? lst_r_parm[i] : lst_l_parm[i];
+            __int64 val_abs = val < 0 ? -val : val;
 
-        counter_k++;
+            if (val < 0)
+                is_f[val_abs] = true;
+            else
+                is_t[val_abs] = true;
+
+        }
+        else {
+
+            __int64 l_abs = lst_l_parm[i] < 0 ? -lst_l_parm[i] : lst_l_parm[i];
+            __int64 r_abs = lst_r_parm[i] < 0 ? -lst_r_parm[i] : lst_r_parm[i];
+
+            lst_l[counter_k] = lst_l_parm[i] < 0 ? -encoding[l_abs] : encoding[l_abs];
+            lst_r[counter_k] = lst_r_parm[i] < 0 ? -encoding[r_abs] : encoding[r_abs];
+
+            counter_k++;
+        }
     }
 
     /*
@@ -353,10 +369,7 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
         true_implies[i] = simp_vector_create(true_implies_cap[i]);
     }
 
-    for (__int64 i = 0; i < k_parm; i++) {
-
-        if (lst_l[i] == FALSE_3SAT || lst_r[i] == FALSE_3SAT)
-            continue;
+    for (__int64 i = 0; i < counter_k; i++) {
 
         __int64 l_abs = lst_l[i] < 0 ? -lst_l[i] : lst_l[i];
         __int64 r_abs = lst_r[i] < 0 ? -lst_r[i] : lst_r[i];
@@ -401,30 +414,6 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
                 trues[i] = true;
             else
                 falses[i] = true;
-
-        for (__int64 i = 0; i < k_parm; i++) {
-
-            __int64 count_f = 0;
-
-            if (lst_l[i] == FALSE_3SAT)
-                count_f++;
-
-            if (lst_r[i] == FALSE_3SAT)
-                count_f++;
-
-            if (count_f == 2)
-                continue;
-            else if (count_f == 1) {
-
-                __int64 val = lst_l[i] == FALSE_3SAT ? lst_r[i] : lst_l[i];
-                __int64 val_abs = val < 0 ? -val : val;
-
-                if (val < 0)
-                    falses[val_abs] = true;
-                else
-                    trues[val_abs] = true;
-            }
-        }
 
         for (__int64 i = ix; i < n; i++)
             if (Z[i]) {
