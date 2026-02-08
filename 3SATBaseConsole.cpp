@@ -391,16 +391,26 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
 
         for (__int64 i = 0; i < k_parm; i++) {
 
-            if (lst_l[i] != FALSE_3SAT && lst_r[i] != FALSE_3SAT)
+            __int64 count_f = 0;
+
+            if (lst_l[i] == FALSE_3SAT)
+                count_f++;
+
+            if (lst_r[i] == FALSE_3SAT)
+                count_f++;
+
+            if (count_f == 2)
                 continue;
+            else if (count_f == 1) {
 
-            __int64 val = lst_l[i] == FALSE_3SAT ? lst_r[i] : lst_l[i];
-            __int64 val_abs = val < 0 ? -val : val;
+                __int64 val = lst_l[i] == FALSE_3SAT ? lst_r[i] : lst_l[i];
+                __int64 val_abs = val < 0 ? -val : val;
 
-            if (val < 0)
-                falses[val_abs] = true;
-            else
-                trues[val_abs] = true;
+                if (val < 0)
+                    falses[val_abs] = true;
+                else
+                    trues[val_abs] = true;
+            }
         }
 
         for (__int64 i = ix; i < n; i++)
