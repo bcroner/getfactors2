@@ -104,11 +104,11 @@ char* nat_test_add(__int64 * len_para) {
         __int64 k = 0;
         __int64** input = input_from_char_buf(buf_3sat, buf_3sat_sz, &k, false);
 
-        /*
+        ///*
         for (__int64 i = 0; i < k; i++) {
-            __int64 a = input[i][0] == FALSE_3SAT ? 0 : input[i][0] < 0 ? input[i][0] + 1 : input[i][0] - 1;
-            __int64 b = input[i][1] == FALSE_3SAT ? 0 : input[i][1] < 0 ? input[i][1] + 1 : input[i][1] - 1;
-            __int64 c = input[i][2] == FALSE_3SAT ? 0 : input[i][2] < 0 ? input[i][2] + 1 : input[i][2] - 1;
+            __int64 a = input[i][0] == FALSE_3SAT ? 0 : input[i][0] < 0 ? input[i][0] : input[i][0];
+            __int64 b = input[i][1] == FALSE_3SAT ? 0 : input[i][1] < 0 ? input[i][1] : input[i][1];
+            __int64 c = input[i][2] == FALSE_3SAT ? 0 : input[i][2] < 0 ? input[i][2] : input[i][2];
             char a_str[16];
             char b_str[16];
             char c_str[16];
@@ -124,7 +124,7 @@ char* nat_test_add(__int64 * len_para) {
                 sprintf_s(c_str, 16, "%s", "");
             else
                 sprintf_s(c_str, 16, "%lld", c);
-            printf_s("%s %s %s 0\n", a_str, b_str, c_str);
+            printf_s("%s %s %s\n", a_str, b_str, c_str);
         }
         printf_s("\n");
         //*/
@@ -142,6 +142,11 @@ char* nat_test_add(__int64 * len_para) {
         SATSolver_create(s, input, k, num_para, 0, 0);
 
         is_sat = SATSolver_isSat(s, sln);
+
+        for (__int64 i = 0; i < num_para; i++)
+            printf_s("%lld: %lld\n", i, sln[i] ? 1 : 0);
+
+        printf_s("\n");
 
         SATSolver_destroy(s);
 
