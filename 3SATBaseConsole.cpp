@@ -263,8 +263,6 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
     printf_s("\n");
     //*/
 
-    __int64 counter = 2;
-
     __int64* encoding = new __int64[n_parm]; // from 2..n_parm to 2..n
 
     for (__int64 i = 0; i < n_parm; i++)
@@ -300,15 +298,10 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
     __int64 n = 2;
 
     for (__int64 i = 2; i < n_parm; i++)
-        if (used[i])
-            n++;
-
-    for (__int64 i = 2; i < n_parm; i++) {
         if (used[i]) {
-            encoding[i] = counter;
-            counter++;
+            encoding[i] = n;
+            n++;
         }
-    }
 
     __int64* lst_l = new __int64[k_parm];
     __int64* lst_r = new __int64[k_parm];
@@ -402,7 +395,7 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
             trues[i] = false;
         }
 
-        for (__int64 i = 0; i < n_parm; i++) {
+        for (__int64 i = 2; i < n_parm; i++) {
             if (is_f[i])
                 falses[encoding[i]] = true;
             if (is_t[i])
