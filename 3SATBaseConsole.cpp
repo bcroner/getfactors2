@@ -586,59 +586,78 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
                 is_f[i] = true;
         }
 
-        for (__int64 i = 2; i < s->n; i++) {
+        bool changed;
 
-            if (is_t[i]) {
+        do {
 
-                for (__int64 j = 0; j < s->cd_sizes_t[i]; j++) {
+            changed = false;
 
-                    __int64 count_f = 0;
+            for (__int64 i = 2; i < s->n; i++) {
 
-                    if (s->cdopcelll_t[i][j] == FALSE_3SAT)
-                        count_f++;
-                    if (s->cdopcellr_t[i][j] == FALSE_3SAT)
-                        count_f++;
+                if (is_t[i]) {
 
-                    if (count_f == 2)
-                        continue;
-                    else if ( count_f == 1 ) {
+                    for (__int64 j = 0; j < s->cd_sizes_t[i]; j++) {
 
-                        __int64 val = s->cdopcelll_t[i][j] == FALSE_3SAT ? s->cdopcellr_t[i][j] : s->cdopcelll_t[i][j];
-                        __int64 val_abs = val < 0 ? -val : val;
+                        __int64 count_f = 0;
 
-                        if (val < 0)
-                            is_f[val_abs] = true;
-                        else
-                            is_t[val_abs] = true;
+                        if (s->cdopcelll_t[i][j] == FALSE_3SAT)
+                            count_f++;
+                        if (s->cdopcellr_t[i][j] == FALSE_3SAT)
+                            count_f++;
+
+                        if (count_f == 2)
+                            continue;
+                        else if (count_f == 1) {
+
+                            __int64 val = s->cdopcelll_t[i][j] == FALSE_3SAT ? s->cdopcellr_t[i][j] : s->cdopcelll_t[i][j];
+                            __int64 val_abs = val < 0 ? -val : val;
+
+                            if (val < 0)
+                                if (!is_f[val_abs]) {
+                                    is_f[val_abs] = true;
+                                    changed = true;
+                                }
+                                else
+                                    if (!is_t[val_abs]) {
+                                        is_t[val_abs] = true;
+                                        changed = true;
+                                    }
+                        }
+                    }
+                }
+                if (is_f[i]) {
+
+                    for (__int64 j = 0; j < s->cd_sizes_f[i]; j++) {
+
+                        __int64 count_f = 0;
+
+                        if (s->cdopcelll_f[i][j] == FALSE_3SAT)
+                            count_f++;
+                        if (s->cdopcellr_f[i][j] == FALSE_3SAT)
+                            count_f++;
+
+                        if (count_f == 2)
+                            continue;
+                        else if (count_f == 1) {
+
+                            __int64 val = s->cdopcelll_f[i][j] == FALSE_3SAT ? s->cdopcellr_f[i][j] : s->cdopcelll_f[i][j];
+                            __int64 val_abs = val < 0 ? -val : val;
+
+                            if (val < 0)
+                                if (!is_f[val_abs]) {
+                                    is_f[val_abs] = true;
+                                    changed = true;
+                                }
+                            else
+                                if (!is_t[val_abs]) {
+                                    is_t[val_abs] = true;
+                                    changed = true;
+                                }
+                        }
                     }
                 }
             }
-            if (is_f[i]) {
-
-                for (__int64 j = 0; j < s->cd_sizes_f[i]; j++) {
-
-                    __int64 count_f = 0;
-
-                    if (s->cdopcelll_f[i][j] == FALSE_3SAT)
-                        count_f++;
-                    if (s->cdopcellr_f[i][j] == FALSE_3SAT)
-                        count_f++;
-                    
-                    if (count_f == 2)
-                        continue;
-                    else if ( count_f == 1 ) {
-
-                        __int64 val = s->cdopcelll_f[i][j] == FALSE_3SAT ? s->cdopcellr_f[i][j] : s->cdopcelll_f[i][j];
-                        __int64 val_abs = val < 0 ? -val : val;
-
-                        if (val < 0)
-                            is_f[val_abs] = true;
-                        else
-                            is_t[val_abs] = true;
-                    }
-                }
-            }
-        }
+        } while (changed);
 
         __int64 size_2sat = 0;
 
