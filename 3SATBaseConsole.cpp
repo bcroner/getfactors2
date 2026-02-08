@@ -613,7 +613,7 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
                     }
                 }
             }
-            else if (!s->Z[i] || always_f[i]) {
+            if (!s->Z[i] || always_f[i]) {
 
                 for (__int64 j = 0; j < s->cd_sizes_f[i]; j++) {
 
@@ -671,7 +671,7 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
                     cd_2sat_cur_sz_t++;
                 }
             }
-            else if (!s->Z[i] || is_f[i]) {
+            if (!s->Z[i] || is_f[i]) {
 
                 for (__int64 j = 0; j < s->cd_sizes_f[i]; j++) {
 
@@ -695,7 +695,7 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
                     cd_2sat_cur_sz_t++;
                 }
             }
-            else if (is_f[i]) {
+            if (is_f[i]) {
 
                 for (__int64 j = 0; j < s->cd_sizes_f[i]; j++) {
 
