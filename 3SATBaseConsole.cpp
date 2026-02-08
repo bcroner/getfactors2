@@ -612,16 +612,18 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
                             __int64 val = s->cdopcelll_t[i][j] == FALSE_3SAT ? s->cdopcellr_t[i][j] : s->cdopcelll_t[i][j];
                             __int64 val_abs = val < 0 ? -val : val;
 
-                            if (val < 0)
+                            if (val < 0) {
                                 if (!is_f[val_abs]) {
                                     is_f[val_abs] = true;
                                     changed = true;
                                 }
-                                else
-                                    if (!is_t[val_abs]) {
-                                        is_t[val_abs] = true;
-                                        changed = true;
-                                    }
+                            }
+                            else {
+                                if (!is_t[val_abs]) {
+                                    is_t[val_abs] = true;
+                                    changed = true;
+                                }
+                            }
                         }
                     }
                 }
@@ -643,16 +645,18 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
                             __int64 val = s->cdopcelll_f[i][j] == FALSE_3SAT ? s->cdopcellr_f[i][j] : s->cdopcelll_f[i][j];
                             __int64 val_abs = val < 0 ? -val : val;
 
-                            if (val < 0)
+                            if (val < 0) {
                                 if (!is_f[val_abs]) {
                                     is_f[val_abs] = true;
                                     changed = true;
                                 }
-                            else
+                            }
+                            else {
                                 if (!is_t[val_abs]) {
                                     is_t[val_abs] = true;
                                     changed = true;
                                 }
+                            }
                         }
                     }
                 }
