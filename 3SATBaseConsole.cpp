@@ -456,7 +456,7 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
             ix--;
         else if (contradiction) {
 
-            while (ix < n )
+            while (ix < n)
                 if (Z[ix]) {
                     Z[ix] = false;
                     ix++;
