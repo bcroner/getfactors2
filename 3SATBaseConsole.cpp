@@ -582,7 +582,7 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
 
             if (s->Z[i])
                 is_t[i] = true;
-            if (!s->Z[i])
+            else
                 is_f[i] = true;
         }
 
@@ -648,7 +648,7 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
             else if (!s->Z[i] || is_f[i])
                 size_2sat += s->cd_sizes_f[i];
 
-        for (__int64 i = 0; i < ix; i++)
+        for (__int64 i = 2; i < ix; i++)
             if (is_t[i])
                 size_2sat += s->cd_sizes_t[i];
             else if (is_f[i])
@@ -658,7 +658,6 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
         __int64* cd_2sat_r = new __int64[size_2sat];
         __int64 cd_2sat_cur_sz_f = 0;
         __int64 cd_2sat_cur_sz_t = 0;
-
 
         for (__int64 i = ix; i < s->n; i++) {
 
@@ -676,10 +675,10 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
 
                 for (__int64 j = 0; j < s->cd_sizes_f[i]; j++) {
 
-                        cd_2sat_l[cd_2sat_cur_sz_f + cd_2sat_cur_sz_t] = s->cdopcelll_f[i][j];
-                        cd_2sat_r[cd_2sat_cur_sz_f + cd_2sat_cur_sz_t] = s->cdopcellr_f[i][j];
+                    cd_2sat_l[cd_2sat_cur_sz_f + cd_2sat_cur_sz_t] = s->cdopcelll_f[i][j];
+                    cd_2sat_r[cd_2sat_cur_sz_f + cd_2sat_cur_sz_t] = s->cdopcellr_f[i][j];
 
-                        cd_2sat_cur_sz_f++;
+                    cd_2sat_cur_sz_f++;
                 }
             }
         }
