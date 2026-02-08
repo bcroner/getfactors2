@@ -159,17 +159,14 @@ void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n, __int64
             __int64 abs_m = s->inopcell_m[j] < 0 ? -s->inopcell_m[j] : s->inopcell_m[j];
             __int64 abs_r = s->inopcell_r[j] < 0 ? -s->inopcell_r[j] : s->inopcell_r[j];
 
-            __int64 count = 0;
+            __int64 count_f = 0;
 
             if (abs_l == 1)
-                count++;
+                count_f++;
             if (abs_m == 1)
-                count++;
+                count_f++;
             if (abs_r == 1)
-                count++;
-
-            if (count == 2)
-                continue;
+                count_f++;
 
             __int64 loc = -1;
             __int64 val = 0;
@@ -190,18 +187,26 @@ void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n, __int64
                 continue;
 
             if (val < 0) {
+
                 __int64 left_val = loc == LVAL ? s->inopcell_m[j] : loc == MVAL ? s->inopcell_l[j] : s->inopcell_l[j];
                 __int64 right_val = loc == LVAL ? s->inopcell_r[j] : loc == MVAL ? s->inopcell_r[j] : s->inopcell_m[j];
+
                 simp_vector_append(&(s->cdopcelll_t[i]), &(s->cdol_vtop_t[i]), &(s->cdol_vcap_t[i]), left_val);
                 simp_vector_append(&(s->cdopcellr_t[i]), &(s->cdor_vtop_t[i]), &(s->cdor_vcap_t[i]), right_val);
-                s->cd_sizes_t[i]++;
+
+                if (count_f == 0)
+                    s->cd_sizes_t[i]++;
             }
             else {
+
                 __int64 left_val = loc == LVAL ? s->inopcell_m[j] : loc == MVAL ? s->inopcell_l[j] : s->inopcell_l[j];
                 __int64 right_val = loc == LVAL ? s->inopcell_r[j] : loc == MVAL ? s->inopcell_r[j] : s->inopcell_m[j];
+
                 simp_vector_append(&(s->cdopcelll_f[i]), &(s->cdol_vtop_f[i]), &(s->cdol_vcap_f[i]), left_val);
                 simp_vector_append(&(s->cdopcellr_f[i]), &(s->cdor_vtop_f[i]), &(s->cdor_vcap_f[i]), right_val);
-                s->cd_sizes_f[i]++;
+
+                if (count_f == 0)
+                    s->cd_sizes_f[i]++;
             }
 
         }
@@ -587,10 +592,16 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
         __int64 size_2sat = 0;
 
         for (__int64 i = s->n - 1; i >= ix; i--)
-            if (s->Z[i])
+            if (s->Z[i] || always_t[i])
                 size_2sat += s->cd_sizes_t[i];
-            else
+            else if (!s->Z[i] || always_f[i])
                 size_2sat += s->cd_sizes_f[i];
+        
+        for (__int64 i = 2; i < ix; i++)
+            if (always_f[i])
+                size_2sat += s->cd_sizes_f[i];
+            else if (always_t[i])
+                size_2sat += s->cd_sizes_t[i];
 
         __int64* cd_2sat_l = new __int64[size_2sat];
         __int64* cd_2sat_r = new __int64[size_2sat];
@@ -598,7 +609,9 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
         __int64 cd_2sat_cur_sz_t = 0;
 
         for (__int64 i = ix; i < s->n; i++) {
-            if (s->Z[i]) {
+
+            if (s->Z[i] || always_t[i]) {
+
                 for (__int64 j = 0; j < s->cd_sizes_t[i]; j++) {
 
                     __int64 count_f = 0;
@@ -629,7 +642,8 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
                     }
                 }
             }
-            else {
+            else if (!s->Z[i] || always_f[i]) {
+
                 for (__int64 j = 0; j < s->cd_sizes_f[i]; j++) {
 
                     __int64 count_f = 0;
@@ -662,7 +676,75 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
             }
         }
 
-        bool is_2sat_sat = (cd_2sat_cur_sz_f + cd_2sat_cur_sz_t) == 0 ? true : two_sat(cd_2sat_l, cd_2sat_r, cd_2sat_cur_sz_f + cd_2sat_cur_sz_t, s->n, is_f, is_t);
+        for (__int64 i = 2; i < ix; i++) {
+
+            if (always_t[i]) {
+
+                for (__int64 j = 0; j < s->cd_sizes_t[i]; j++) {
+
+                    __int64 count_f = 0;
+
+                    if (s->cdopcelll_t[i][j] == FALSE_3SAT)
+                        count_f++;
+                    if (s->cdopcellr_t[i][j] == FALSE_3SAT)
+                        count_f++;
+
+                    if (count_f == 2)
+                        continue;
+                    else if (count_f == 1) {
+
+                        __int64 val = s->cdopcelll_t[i][j] == FALSE_3SAT ? s->cdopcellr_t[i][j] : s->cdopcelll_t[i][j];
+                        __int64 val_abs = val < 0 ? -val : val;
+
+                        if (val < 0)
+                            is_f[val_abs] = true;
+                        else
+                            is_t[val_abs] = true;
+                    }
+                    else {
+
+                        cd_2sat_l[cd_2sat_cur_sz_f + cd_2sat_cur_sz_t] = s->cdopcelll_t[i][j];
+                        cd_2sat_r[cd_2sat_cur_sz_f + cd_2sat_cur_sz_t] = s->cdopcellr_t[i][j];
+
+                        cd_2sat_cur_sz_t++;
+                    }
+                }
+            }
+            else if (always_f[i]) {
+
+                for (__int64 j = 0; j < s->cd_sizes_f[i]; j++) {
+
+                    __int64 count_f = 0;
+
+                    if (s->cdopcelll_f[i][j] == FALSE_3SAT)
+                        count_f++;
+                    if (s->cdopcellr_f[i][j] == FALSE_3SAT)
+                        count_f++;
+
+                    if (count_f == 2)
+                        continue;
+                    else if (count_f == 1) {
+
+                        __int64 val = s->cdopcelll_f[i][j] == FALSE_3SAT ? s->cdopcellr_f[i][j] : s->cdopcelll_f[i][j];
+                        __int64 val_abs = val < 0 ? -val : val;
+
+                        if (val < 0)
+                            is_f[val_abs] = true;
+                        else
+                            is_t[val_abs] = true;
+                    }
+                    else {
+
+                        cd_2sat_l[cd_2sat_cur_sz_f + cd_2sat_cur_sz_t] = s->cdopcelll_f[i][j];
+                        cd_2sat_r[cd_2sat_cur_sz_f + cd_2sat_cur_sz_t] = s->cdopcellr_f[i][j];
+
+                        cd_2sat_cur_sz_f++;
+                    }
+                }
+            }
+        }
+
+        bool is_2sat_sat = (cd_2sat_cur_sz_f + cd_2sat_cur_sz_t) == 0 ? true : two_sat(cd_2sat_l, cd_2sat_r, size_2sat, s->n, is_f, is_t);
 
         delete[] cd_2sat_l;
         delete[] cd_2sat_r;
