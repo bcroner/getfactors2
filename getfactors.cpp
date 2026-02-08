@@ -124,7 +124,7 @@ char* nat_test_add(__int64 * len_para) {
                 sprintf_s(c_str, 16, "%s", "");
             else
                 sprintf_s(c_str, 16, "%lld", c);
-            printf_s("%s %s %s\n", a_str, b_str, c_str);
+            printf_s("%lld: %s %s %s\n", i, a_str, b_str, c_str);
         }
         printf_s("\n");
         //*/

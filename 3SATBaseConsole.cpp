@@ -161,11 +161,11 @@ void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n, __int64
 
             __int64 count_f = 0;
 
-            if (abs_l == 1)
+            if (s->inopcell_l[j] == FALSE_3SAT)
                 count_f++;
-            if (abs_m == 1)
+            if (s->inopcell_m[j] == FALSE_3SAT)
                 count_f++;
-            if (abs_r == 1)
+            if (s->inopcell_r[j] == FALSE_3SAT)
                 count_f++;
 
             __int64 loc = -1;
@@ -681,7 +681,10 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
 
             if (is_t[i]) {
 
-                for (__int64 j = 0; j < s->cd_sizes_t[i]; j++) {
+                for (__int64 j = 0; j < s->cdor_vtop_t[i] + 1; j++) {
+
+                    if (s->cdopcelll_t[i][j] == FALSE_3SAT || s->cdopcellr_t[i][j] == FALSE_3SAT)
+                        continue;
 
                     cd_2sat_l[cd_2sat_cur_sz_f + cd_2sat_cur_sz_t] = s->cdopcelll_t[i][j];
                     cd_2sat_r[cd_2sat_cur_sz_f + cd_2sat_cur_sz_t] = s->cdopcellr_t[i][j];
@@ -691,7 +694,10 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
             }
             if (is_f[i]) {
 
-                for (__int64 j = 0; j < s->cd_sizes_f[i]; j++) {
+                for (__int64 j = 0; j < s->cdor_vtop_f[i] + 1; j++) {
+
+                    if (s->cdopcelll_f[i][j] == FALSE_3SAT || s->cdopcellr_f[i][j] == FALSE_3SAT)
+                        continue;
 
                     cd_2sat_l[cd_2sat_cur_sz_f + cd_2sat_cur_sz_t] = s->cdopcelll_f[i][j];
                     cd_2sat_r[cd_2sat_cur_sz_f + cd_2sat_cur_sz_t] = s->cdopcellr_f[i][j];
