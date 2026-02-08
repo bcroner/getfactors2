@@ -568,7 +568,7 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
             is_t[i] = false;
         }
 
-        for (__int64 i = 0; i < s->n; i++) {
+        for (__int64 i = 2; i < s->n; i++) {
 
             if (always_f[i])
                 is_f[i] = true;
@@ -669,7 +669,7 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
 
         if (is_2sat_sat && ix == 2) {
 
-            for (__int64 i = 0; i < s->n; i++)
+            for (__int64 i = 2; i < s->n; i++)
                 sln[i] = s->Z[i];
 
             is_sat = true;
