@@ -395,30 +395,54 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
             else
                 falses[i] = true;
 
-        for (__int64 i = ix; i < n; i++)
-            if (Z[i]) {
-                for (__int64 j = 0; j < true_implies_top[i] + 1; j++) {
+        bool changed;
 
-                    __int64 val = true_implies[i][j];
-                    __int64 val_abs = val < 0 ? -val : val;
+        do {
 
-                    if (val < 0)
-                        falses[val_abs] = true;
-                    else
-                        trues[val_abs] = true;
+            changed = false;
+
+            for (__int64 i = 2; i < n; i++) {
+                if (trues[i]) {
+                    for (__int64 j = 0; j < true_implies_top[i] + 1; j++) {
+
+                        __int64 val = true_implies[i][j];
+                        __int64 val_abs = val < 0 ? -val : val;
+
+                        if (val < 0) {
+                            if (!falses[val_abs]) {
+                                falses[val_abs] = true;
+                                changed = true;
+                            }
+                        }
+                        else {
+                            if (!trues[val_abs]) {
+                                trues[val_abs] = true;
+                                changed = true;
+                            }
+                        }
+                    }
                 }
-            }
-            else
-                for(__int64 j = 0; j < false_implies_top[i] + 1; j++) {
+                if (falses[i])
+                    for (__int64 j = 0; j < false_implies_top[i] + 1; j++) {
 
-                __int64 val = false_implies[i][j];
-                __int64 val_abs = val < 0 ? -val : val;
+                        __int64 val = false_implies[i][j];
+                        __int64 val_abs = val < 0 ? -val : val;
 
-                if (val < 0)
-                    falses[val_abs] = true;
-                else
-                    trues[val_abs] = true;
+                        if (val < 0) {
+                            if (!falses[val_abs]) {
+                                falses[val_abs] = true;
+                                changed = true;
+                            }
+                        }
+                        else {
+                            if (!trues[val_abs]) {
+                                trues[val_abs] = true;
+                                changed = true;
+                            }
+                        }
+                    }
             }
+        } while (changed);
             
         bool contradiction = false;
 
