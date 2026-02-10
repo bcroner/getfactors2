@@ -605,7 +605,7 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
 
                 if (is_t[i]) {
 
-                    for (__int64 j = 0; j < s->cd_sizes_t[i]; j++) {
+                    for (__int64 j = 0; j < s->cdol_vtop_t[i] + 1; j++) {
 
                         __int64 count_f = 0;
 
@@ -636,7 +636,7 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
                 }
                 if (is_f[i]) {
 
-                    for (__int64 j = 0; j < s->cd_sizes_f[i]; j++) {
+                    for (__int64 j = 0; j < s->cdol_vtop_f[i] + 1; j++) {
 
                         __int64 count_f = 0;
 
@@ -721,8 +721,11 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
 
         if (is_2sat_sat && ix == 2) {
 
-            for (__int64 i = 2; i < s->n; i++)
+            for (__int64 i = 2; i < s->n; i++) {
                 sln[i] = s->Z[i];
+                //printf_s("%lld ", sln[i] ? i : -i);
+            }
+            //printf_s("\n");
 
             is_sat = true;
 
