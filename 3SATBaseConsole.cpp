@@ -275,7 +275,7 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
     for (__int64 i = 0; i < n_parm; i++)
         used[i] = false;
 
-    for (__int64 i = 0; i < n_parm; i++)
+    for (__int64 i = 2; i < n_parm; i++)
         if (is_f[i] || is_t[i])
             used[i] = true;
 
