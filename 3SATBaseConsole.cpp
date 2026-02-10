@@ -668,6 +668,8 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
             }
         } while (changed);
 
+        // printf_s("ix: %lld\n", ix);
+
         __int64 size_2sat = 0;
 
         for (__int64 i = 2; i < s->n; i++) {
