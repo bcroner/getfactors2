@@ -614,9 +614,7 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
                         if (s->cdopcellr_t[i][j] == FALSE_3SAT)
                             count_f++;
 
-                        if (count_f == 2)
-                            continue;
-                        else if (count_f == 1) {
+                        if (count_f == 1) {
 
                             __int64 val = s->cdopcelll_t[i][j] == FALSE_3SAT ? s->cdopcellr_t[i][j] : s->cdopcelll_t[i][j];
                             __int64 val_abs = val < 0 ? -val : val;
@@ -647,9 +645,7 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
                         if (s->cdopcellr_f[i][j] == FALSE_3SAT)
                             count_f++;
 
-                        if (count_f == 2)
-                            continue;
-                        else if (count_f == 1) {
+                        if (count_f == 1) {
 
                             __int64 val = s->cdopcelll_f[i][j] == FALSE_3SAT ? s->cdopcellr_f[i][j] : s->cdopcelll_f[i][j];
                             __int64 val_abs = val < 0 ? -val : val;
