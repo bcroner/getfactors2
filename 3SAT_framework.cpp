@@ -1186,10 +1186,10 @@ char* nat_equals(__int64 * num_para, nat_3sat* a, nat_3sat* b, bool eq, __int64*
     }
 
     for (int i = 0; i < a->sz; i++)
-        a_mod->bits[a_mod->sz - 1 - i]->id = a->bits[a->sz - 1 - i]->id;
+        a_mod->bits[i]->id = a->bits[i]->id;
 
     for (int i = 0; i < b->sz; i++)
-        b_mod->bits[b_mod->sz - 1 - i]->id = b->bits[b->sz - 1 - i]->id;
+        b_mod->bits[i]->id = b->bits[i]->id;
 
     // create return buffer
 
