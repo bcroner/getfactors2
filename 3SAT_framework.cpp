@@ -331,7 +331,7 @@ char* xor_3sat(__int64* num_para, bit_3sat** c, bit_3sat* a, bit_3sat* b, __int6
 
 }
 
-// c = a xnor b: (~a or ~b or c) (a or b or c) (a or ~b or ~c) (~a or b or ~c)
+// c = a xnor b: (a or b or c) (~a or ~b or c) (~a or b or ~c) (a or ~b or ~c)
 
 char* xnor_3sat(__int64* num_para, bit_3sat** c, bit_3sat* a, bit_3sat* b, __int64* len_para) {
 
@@ -353,10 +353,10 @@ char* xnor_3sat(__int64* num_para, bit_3sat** c, bit_3sat* a, bit_3sat* b, __int
     for (__int64 i = 0; i < 4; i++)
         lst[i] = new char[64];
 
-    sprintf_s(lst[0], 64, "%lld %lld %lld", -a->id, -b->id, (*c)->id);
-    sprintf_s(lst[1], 64, "%lld %lld %lld", a->id, b->id, (*c)->id);
-    sprintf_s(lst[2], 64, "%lld %lld %lld", a->id, -b->id, -(*c)->id);
-    sprintf_s(lst[3], 64, "%lld %lld %lld", -a->id, b->id, -(*c)->id);
+    sprintf_s(lst[0], 64, "%lld %lld %lld", a->id, b->id, (*c)->id);
+    sprintf_s(lst[1], 64, "%lld %lld %lld", -a->id, -b->id, (*c)->id);
+    sprintf_s(lst[2], 64, "%lld %lld %lld", -a->id, b->id, -(*c)->id);
+    sprintf_s(lst[3], 64, "%lld %lld %lld", a->id, -b->id, -(*c)->id);
 
     __int64 ret_len = 1;
     for (__int64 i = 0; i < 4; i++)
@@ -1193,6 +1193,8 @@ char* nat_equals(__int64 * num_para, nat_3sat* a, nat_3sat* b, bool eq, __int64*
 
     // xnor them all together
 
+    //__int64 xor_str_len = 0;
+    //__int64 not_str_len = 0;
     __int64 xnor_str_len = 0;
 
     nat_3sat* c = new nat_3sat();
@@ -1200,12 +1202,21 @@ char* nat_equals(__int64 * num_para, nat_3sat* a, nat_3sat* b, bool eq, __int64*
     c->bits = new bit_3sat * [num_sz];
 
     for (__int64 i = 0; i < num_sz; i++) {
-        char* xnor_str = xnor_3sat(num_para, &(c->bits[i]), a_mod->bits[i], b_mod->bits[i], &xnor_str_len);
+        bit_3sat* temp = NULL;
+        char* xnor_str = xnor_3sat(num_para, &temp, a_mod->bits[i], b_mod->bits[i], &xnor_str_len);
         if (xnor_str_len > 0) {
             strcpy_s(&(ret[pos]), buf_sz - pos, xnor_str);
             pos += xnor_str_len;
             delete[] xnor_str;
         }
+        /*
+        char* not_str = not_3sat(num_para, &(c->bits[i]), temp, &not_str_len);
+        if (not_str_len > 0) {
+            strcpy_s(&(ret[pos]), buf_sz - pos, not_str);
+            pos += not_str_len;
+            delete[] not_str;
+        }
+        //*/
     }
 
     // and all those xnors together
@@ -1232,6 +1243,8 @@ char* nat_equals(__int64 * num_para, nat_3sat* a, nat_3sat* b, bool eq, __int64*
     // verify that d xnors with eq (set to either true or false)
 
     __int64 final_xnor_str_len = 0;
+    //__int64 final_xor_str_len = 0;
+    //__int64 final_not_str_len = 0;
 
     bit_3sat* eq_bit = new bit_3sat();
     eq_bit->id = eq ? TRUE_3SAT : FALSE_3SAT;
@@ -1244,12 +1257,26 @@ char* nat_equals(__int64 * num_para, nat_3sat* a, nat_3sat* b, bool eq, __int64*
         pos += final_xnor_str_len;
     }
 
+    /*
+
+    bit_3sat* g = NULL;
+    char* final_not_str = not_3sat(num_para, &g, f, &final_not_str_len);
+
+    if (final_not_str_len > 0) {
+        strcpy_s(&(ret[pos]), buf_sz - pos, final_not_str);
+        pos += final_not_str_len;
+    }
+    //*/
+
     *len_para = pos;
 
-    if ( final_xnor_str != NULL)
+    if (final_xnor_str != NULL)
         delete final_xnor_str;
+    //if (final_not_str != NULL)
+    //    delete final_not_str;
     delete eq_bit;
     delete f;
+    //delete g;
 
     return ret;
 
