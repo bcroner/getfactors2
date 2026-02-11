@@ -70,12 +70,6 @@ char* and_3sat(__int64* num_para, bit_3sat** c, bit_3sat* a, bit_3sat* b, __int6
     for (__int64 i = 0; i < 3; i++)
         lst[i] = new char[64];
 
-    /*
-    sprintf_s(lst[0], "-%lld -%lld %lld", a->id, b->id, c->id);
-    sprintf_s(lst[1], "%lld -%lld", a->id, c->id);
-    sprintf_s(lst[2], "%lld -%lld", b->id, c->id);
-    */
-
     sprintf_s(lst[0], 64, "%lld %lld %lld", -a->id, -b->id, (*c)->id);
     sprintf_s(lst[1], 64, "%lld %lld %lld", a->id, -(*c)->id, (__int64)FALSE_3SAT);
     sprintf_s(lst[2], 64, "%lld %lld %lld", b->id, -(*c)->id, (__int64)FALSE_3SAT);
