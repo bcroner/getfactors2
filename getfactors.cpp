@@ -413,9 +413,36 @@ char* nat_test_equals(__int64 * len_para) {
     __int64** input = input_from_char_buf(buf_3sat, buf_3sat_sz, &k, false);
     bool* sln = new bool[num_para];
 
+    //*
+    for (__int64 i = 0; i < k; i++) {
+        __int64 a = input[i][0] == FALSE_3SAT ? 0 : input[i][0] < 0 ? input[i][0] + 1 : input[i][0] - 1;
+        __int64 b = input[i][1] == FALSE_3SAT ? 0 : input[i][1] < 0 ? input[i][1] + 1 : input[i][1] - 1;
+        __int64 c = input[i][2] == FALSE_3SAT ? 0 : input[i][2] < 0 ? input[i][2] + 1 : input[i][2] - 1;
+        char a_str[16];
+        char b_str[16];
+        char c_str[16];
+        if (a == 0)
+            sprintf_s(a_str, 16, "%s", "");
+        else
+            sprintf_s(a_str, 16, "%lld", a);
+        if (b == 0)
+            sprintf_s(b_str, 16, "%s", "");
+        else
+            sprintf_s(b_str, 16, "%lld", b);
+        if (c == 0)
+            sprintf_s(c_str, 16, "%s", "");
+        else
+            sprintf_s(c_str, 16, "%lld", c);
+        printf_s("%s %s %s 0\n", a_str, b_str, c_str);
+    }
+    printf_s("\n");
+    //*/
+
+    /*
     for (__int64 i = 0; i < k; i++)
         printf_s("%lld: %lld %lld %lld\n", i, input[i][0], input[i][1], input[i][2]);
     printf_s("\n");
+    //*/
 
     delete[] buf_3sat;
 
@@ -430,6 +457,10 @@ char* nat_test_equals(__int64 * len_para) {
     SATSolver_create(s, input, k, num_para, 0, 0);
 
     is_sat = SATSolver_isSat(s, sln);
+
+    for (__int64 i = 0; i < num_para; i++)
+        printf_s("%lld: %lld\n", i, sln[i] ? 1 : 0);
+    printf_s("\n");
 
     SATSolver_destroy(s);
 
