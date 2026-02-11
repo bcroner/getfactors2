@@ -379,6 +379,31 @@ char* xnor_3sat(__int64* num_para, bit_3sat** c, bit_3sat* a, bit_3sat* b, __int
 
 }
 
+char* force_to_3sat(bit_3sat* a, bool eq, __int64* len_para) {
+
+    char* lst = new char[64];
+
+    if (eq)
+        sprintf_s(lst, 64, "%lld %lld %lld", a->id, (__int64) FALSE_3SAT, (__int64) FALSE_3SAT);
+    else
+        sprintf_s(lst, 64, "%lld %lld %lld", -a->id, (__int64) FALSE_3SAT, (__int64) FALSE_3SAT);
+
+    __int64 ret_len = 1;
+   ret_len += (__int64)strnlen_s(lst, 64) + (__int64)strnlen_s("\n", 2);
+
+    char* ret = new char[ret_len];
+
+    sprintf_s(ret, ret_len, "%s\n", lst);
+
+    *len_para = ret_len;
+
+    delete[] lst;
+
+    return ret;
+
+
+}
+
 // bitadd = a + b + cin: cin xor (a xor b) = (~a or ~b or ~c) (a or b or ~c) (a or ~b or c) (~a or b or c)
 
 char* bitaddsum_3sat(__int64* num_para, bit_3sat** sum, bit_3sat* c_in, bit_3sat* a, bit_3sat* b, __int64* len_para) {
@@ -1242,19 +1267,15 @@ char* nat_equals(__int64 * num_para, nat_3sat* a, nat_3sat* b, bool eq, __int64*
 
     // verify that d xnors with eq (set to either true or false)
 
-    __int64 final_xnor_str_len = 0;
+    __int64 force_to_str_len = 0;
     //__int64 final_xor_str_len = 0;
     //__int64 final_not_str_len = 0;
 
-    bit_3sat* eq_bit = new bit_3sat();
-    eq_bit->id = eq ? TRUE_3SAT : FALSE_3SAT;
+    char* force_to_str = force_to_3sat(d, eq, &force_to_str_len);
 
-    bit_3sat* f = NULL;
-    char* final_xnor_str = xnor_3sat(num_para, &f, d, eq_bit, &final_xnor_str_len);
-
-    if (final_xnor_str_len > 0) {
-        strcpy_s(&(ret[pos]), buf_sz - pos, final_xnor_str);
-        pos += final_xnor_str_len;
+    if (force_to_str_len > 0) {
+        strcpy_s(&(ret[pos]), buf_sz - pos, force_to_str);
+        pos += force_to_str_len;
     }
 
     /*
@@ -1270,13 +1291,8 @@ char* nat_equals(__int64 * num_para, nat_3sat* a, nat_3sat* b, bool eq, __int64*
 
     *len_para = pos;
 
-    if (final_xnor_str != NULL)
-        delete final_xnor_str;
-    //if (final_not_str != NULL)
-    //    delete final_not_str;
-    delete eq_bit;
-    delete f;
-    //delete g;
+    if (force_to_str != NULL)
+        delete force_to_str;
 
     return ret;
 

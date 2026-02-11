@@ -59,6 +59,8 @@ char* xor_3sat(__int64 * num_para, bit_3sat** c, bit_3sat* a, bit_3sat* b, __int
 
 char* xnor_3sat(__int64 * num_para, bit_3sat** c, bit_3sat* a, bit_3sat* b, __int64 * len_para);
 
+char* force_to_3sat(bit_3sat* a, bool eq, __int64* len_para);
+
 char* bitaddsum_3sat(__int64 * num_para, bit_3sat** sum, bit_3sat* c_in, bit_3sat* a, bit_3sat* b, __int64 * len_para);
 
 char* bitaddcout_3sat(__int64 * num_para, bit_3sat** c_out, bit_3sat* c_in, bit_3sat* a, bit_3sat* b, __int64 * len_para);
