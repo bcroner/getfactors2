@@ -2296,7 +2296,7 @@ char* nat_get_factors(char* c_str, __int64 c_str_buf_sz, __int64 * len_para) {
     // transfer over inbuffer
 
     for (__int64 i = 0; i < c_bit_count; i++)
-        c_equals->bits[i]->id = inbuffer[leading_zeros + i] ? TRUE_3SAT : FALSE_3SAT;
+        c_equals->bits[c_bit_count - 1 - i]->id = inbuffer[inbuffer_sz - 1 - leading_zeros - i] ? TRUE_3SAT : FALSE_3SAT;
 
     delete[] inbuffer;
 
@@ -2310,9 +2310,9 @@ char* nat_get_factors(char* c_str, __int64 c_str_buf_sz, __int64 * len_para) {
     b->sz = c_bit_count - 1;
     b->bits = new bit_3sat * [c_bit_count - 1];
 
-    for (__int64 i = 0; i < c_bit_count - 1; i++)
+    for (__int64 i = 0; i < a->sz; i++)
         a->bits[i] = create_bit(&num_para);
-    for (__int64 i = 0; i < c_bit_count - 1; i++)
+    for (__int64 i = 0; i < b->sz; i++)
         b->bits[i] = create_bit(&num_para);
 
     __int64 mul_str_len = 0;
