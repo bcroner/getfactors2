@@ -1203,7 +1203,7 @@ char* nat_equals(__int64 * num_para, nat_3sat* a, nat_3sat* b, bool eq, __int64*
 
     for (__int64 i = 0; i < num_sz; i++) {
         bit_3sat* temp = NULL;
-        char* xnor_str = xnor_3sat(num_para, &temp, a_mod->bits[i], b_mod->bits[i], &xnor_str_len);
+        char* xnor_str = xnor_3sat(num_para, &(c->bits[i]), a_mod->bits[i], b_mod->bits[i], &xnor_str_len);
         if (xnor_str_len > 0) {
             strcpy_s(&(ret[pos]), buf_sz - pos, xnor_str);
             pos += xnor_str_len;
