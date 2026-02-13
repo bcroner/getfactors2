@@ -613,8 +613,8 @@ int main()
     //strcpy_s(c_str, 2000, "6");
     //strcpy_s(c_str, 2000, "7");
     //strcpy_s(c_str, 2000, "8");
-    strcpy_s(c_str, 2000, "F");
-    //strcpy_s(c_str, 2000, "8F");
+    //strcpy_s(c_str, 2000, "F");
+    strcpy_s(c_str, 2000, "8F");
     //char * factors = dec_get_factors(c_str, 2000, & len_para);
     char* factors = nat_get_factors(c_str, 2000, &len_para);
     printf_s("%s\n", factors);
