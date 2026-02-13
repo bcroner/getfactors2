@@ -1205,10 +1205,10 @@ char* nat_equals(__int64 * num_para, nat_3sat* a, nat_3sat* b, bool eq, __int64*
     }
 
     for (int i = 0; i < a->sz; i++)
-        a_mod->bits[i]->id = a->bits[i]->id;
+        a_mod->bits[num_sz - a->sz + i]->id = a->bits[i]->id;
 
     for (int i = 0; i < b->sz; i++)
-        b_mod->bits[i]->id = b->bits[i]->id;
+        b_mod->bits[num_sz - b->sz + i]->id = b->bits[i]->id;
 
     // create return buffer
 
@@ -1227,7 +1227,7 @@ char* nat_equals(__int64 * num_para, nat_3sat* a, nat_3sat* b, bool eq, __int64*
     c->bits = new bit_3sat * [num_sz];
 
     for (__int64 i = 0; i < num_sz; i++) {
-        bit_3sat* temp = NULL;
+
         char* xnor_str = xnor_3sat(num_para, &(c->bits[i]), a_mod->bits[i], b_mod->bits[i], &xnor_str_len);
         if (xnor_str_len > 0) {
             strcpy_s(&(ret[pos]), buf_sz - pos, xnor_str);
