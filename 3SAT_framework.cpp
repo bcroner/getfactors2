@@ -2337,7 +2337,7 @@ char* nat_get_factors(char* c_str, __int64 c_str_buf_sz, __int64 * len_para) {
 
     /*
 
-    printf_s("p cnf %lld %lld\n", num_para - 1, k);
+    printf_s("p cnf %lld %lld\n", num_para, k);
 
     for (__int64 i = 0; i < k; i++) {
         char a[6];
