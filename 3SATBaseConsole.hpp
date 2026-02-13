@@ -52,7 +52,7 @@ void SATSolver_destroy(SATSolver* s);
 bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n_parm, bool* is_f, bool* is_t);
 bool SATSolver_isSat(SATSolver* s, bool* sln);
 void thread_3SAT(__int64 tid, bool* arr, __int64** lst, __int64 k_parm, __int64 n_parm, __int64 chops, __int64 chop);
-bool SATSolver_threads(__int64** lst, __int64 k_parm, __int64 n_parm, bool** arr);
+bool SATSolver_threads(__int64** lst, __int64 k_parm, __int64 n_parm, bool* arr);
 
 
 #endif

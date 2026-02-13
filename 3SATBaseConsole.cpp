@@ -787,6 +787,9 @@ void thread_3SAT(__int64 tid, bool* arr, __int64** lst, __int64 k_parm, __int64 
         thread_id = tid;
         cv.notify_all();
     }
+
+    SATSolver_destroy(s);
+    delete s;
 }
 
 bool SATSolver_threads(__int64** lst, __int64 k_parm, __int64 n_parm, bool* arr) {
@@ -808,20 +811,13 @@ bool SATSolver_threads(__int64** lst, __int64 k_parm, __int64 n_parm, bool* arr)
 
     // get the right number of chops- at least 2^chops
 
-    __int64 count_chops = 1;
-    __int64 chops = 2;
+    __int64 chops = 0;
+    __int64 counter = 1;
 
-    __int64 counter = 0;
+    for (counter = 1; counter < num_threads; counter *= 2)
+        chops++;
 
-    for (counter = 0; count_chops < num_threads; counter++)
-        count_chops *= 2;
-
-    if (count_chops == num_threads)
-        chops = counter;
-    else
-        chops = counter + 1;
-
-    chops += 4;
+    chops += 2;
 
 
     ///*
@@ -847,12 +843,11 @@ bool SATSolver_threads(__int64** lst, __int64 k_parm, __int64 n_parm, bool* arr)
                 break;
             if (pos < search_sz) {
                 threadblock[thread_id] = new std::thread(thread_3SAT, thread_id, arrs[thread_id], lst, k_parm, n_parm, chops, pos);
+                pos++;
                 ready = true;
-                thread_id = -1;
                 cv.notify_all();
             }
         }
-        pos++;
     } while (pos < search_sz && !solved);
 
     //*/

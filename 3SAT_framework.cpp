@@ -2380,6 +2380,10 @@ char* nat_get_factors(char* c_str, __int64 c_str_buf_sz, __int64 * len_para) {
 
     bool is_sat = false;
 
+    //is_sat = SATSolver_threads(input, k, num_para, sln);
+
+    //*
+
     SATSolver* s = new SATSolver();
     SATSolver_create(s, input, k, num_para, 0, 0);
 
@@ -2388,6 +2392,8 @@ char* nat_get_factors(char* c_str, __int64 c_str_buf_sz, __int64 * len_para) {
     SATSolver_destroy(s);
 
     delete s;
+
+    //*/
 
     if (!is_sat)
         return prime_str;
