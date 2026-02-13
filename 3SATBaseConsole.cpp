@@ -789,7 +789,7 @@ void thread_3SAT(__int64 tid, bool* arr, __int64** lst, __int64 k_parm, __int64 
     }
 }
 
-bool SATSolver_threads(__int64** lst, __int64 k_parm, __int64 n_parm, bool** arr) {
+bool SATSolver_threads(__int64** lst, __int64 k_parm, __int64 n_parm, bool* arr) {
 
     __int64 num_threads = std::thread::hardware_concurrency() ;
     
@@ -800,8 +800,11 @@ bool SATSolver_threads(__int64** lst, __int64 k_parm, __int64 n_parm, bool** arr
 
     bool** arrs = new bool* [num_threads];
 
-    for (__int64 i = 0; i < num_threads; i++)
+    for (__int64 i = 0; i < num_threads; i++) {
         arrs[i] = new bool[n_parm];
+        for (__int64 j = 0; j < n_parm; j++)
+            arrs[i][j] = false;
+    }
 
     // get the right number of chops- at least 2^chops
 
@@ -865,7 +868,7 @@ bool SATSolver_threads(__int64** lst, __int64 k_parm, __int64 n_parm, bool** arr
 
     if (solved)
         for (__int64 i = 0; i < n_parm; i++)
-            (*arr)[i] = arrs[thread_id][i];
+            arr[i] = arrs[thread_id][i];
 
     // free up master resources
 
