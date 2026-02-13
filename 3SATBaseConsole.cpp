@@ -857,20 +857,24 @@ bool SATSolver_threads(__int64** lst, __int64 k_parm, __int64 n_parm, bool* arr)
 
     //*/
 
-
-    for (__int64 i = 0; i < num_threads; i++)
-        if (solved && i != thread_id) {
-            threadblock[thread_id]->join();
-            delete threadblock[thread_id];
-        }
-
-    delete[] threadblock;
-
     if (solved)
         for (__int64 i = 0; i < n_parm; i++)
             arr[i] = arrs[thread_id][i];
 
+    for (__int64 i = 0; i < num_threads; i++) {
+
+        threadblock[i]->join();
+        delete threadblock[i];
+    }
+
+    delete[] threadblock;
+
     // free up master resources
+
+    for (__int64 i = 0; i < num_threads; i++)
+        delete[] arrs[i];
+
+    delete[] arrs;
 
     return solved;
 }
