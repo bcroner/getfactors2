@@ -7,6 +7,9 @@
 #include "3SATBaseConsole.hpp"
 
 #include <stdio.h>
+#include <thread>
+#include <condition_variable>
+#include <mutex>
 
 #define LVAL 0
 #define MVAL 1
@@ -760,6 +763,113 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
     delete[] is_f;
 
     return is_sat;
+}
+
+std::mutex m;
+std::condition_variable cv;
+bool done = false;
+bool ready = true;
+bool solved = false;
+__int64 thread_id = -1;
+
+void thread_3SAT(__int64 tid, bool* arr, __int64** lst, __int64 k_parm, __int64 n_parm, __int64 chops, __int64 chop) {
+
+    SATSolver* s = new SATSolver();
+    SATSolver_create(s, lst, k_parm, n_parm, chops, chop);
+
+    bool sat = SATSolver_isSat(s, arr);
+
+    {
+        std::unique_lock<std::mutex> lock(m);
+        cv.wait(lock, [] {return ready; });
+        ready = false;
+        done = sat;
+        thread_id = tid;
+        cv.notify_all();
+    }
+}
+
+bool SATSolver_threads(__int64** lst, __int64 k_parm, __int64 n_parm, bool** arr) {
+
+    __int64 num_threads = std::thread::hardware_concurrency() ;
+    
+    std::thread** threadblock = new std::thread * [num_threads];
+
+    for (__int64 i = 0; i < num_threads; i++)
+        threadblock[i] = NULL;
+
+    bool** arrs = new bool* [num_threads];
+
+    for (__int64 i = 0; i < num_threads; i++)
+        arrs[i] = new bool[n_parm];
+
+    // get the right number of chops- at least 2^chops
+
+    __int64 count_chops = 1;
+    __int64 chops = 2;
+
+    __int64 counter = 0;
+
+    for (counter = 0; count_chops < num_threads; counter++)
+        count_chops *= 2;
+
+    if (count_chops == num_threads)
+        chops = counter;
+    else
+        chops = counter + 1;
+
+    chops += 4;
+
+
+    ///*
+
+    __int64 search_sz = 1;
+
+    for (__int64 i = 0; i < chops; i++)
+        search_sz *= 2;
+
+
+    __int64 pos = 0;
+    for (pos = 0; pos < num_threads; pos++)
+        threadblock[pos] = new std::thread(thread_3SAT, pos, arrs[pos], lst, k_parm, n_parm, chops, pos);
+
+    do {
+        {
+            std::unique_lock<std::mutex> lock(m);
+            cv.wait(lock, [] {return !ready; });
+            threadblock[thread_id]->join();
+            delete threadblock[thread_id];
+            solved = done;
+            if (solved)
+                break;
+            if (pos < search_sz) {
+                threadblock[thread_id] = new std::thread(thread_3SAT, thread_id, arrs[thread_id], lst, k_parm, n_parm, chops, pos);
+                ready = true;
+                thread_id = -1;
+                cv.notify_all();
+            }
+        }
+        pos++;
+    } while (pos < search_sz && !solved);
+
+    //*/
+
+
+    for (__int64 i = 0; i < num_threads; i++)
+        if (solved && i != thread_id) {
+            threadblock[thread_id]->join();
+            delete threadblock[thread_id];
+        }
+
+    delete[] threadblock;
+
+    if (solved)
+        for (__int64 i = 0; i < n_parm; i++)
+            (*arr)[i] = arrs[thread_id][i];
+
+    // free up master resources
+
+    return solved;
 }
 
 #endif
