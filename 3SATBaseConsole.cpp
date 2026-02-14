@@ -864,7 +864,7 @@ bool SATSolver_threads(__int64** lst, __int64 k_parm, __int64 n_parm, bool* arr)
 
     if (solved)
         for (__int64 i = 0; i < n_parm; i++)
-            arr[i] = arrs[thread_id][i];
+            arr[i] = arrs[sol_id][i];
 
     for (__int64 i = 0; i < num_threads; i++) {
 
