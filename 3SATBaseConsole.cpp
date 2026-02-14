@@ -770,7 +770,9 @@ std::condition_variable cv;
 bool done = false;
 bool ready = true;
 bool solved = false;
-__int64 thread_id = -1;
+__int64 *thread_id;
+__int64 thread_id_top;
+__int64 thread_id_cap;
 __int64 sol_id = -1;
 __int64 active_threads = 0;
 
@@ -788,7 +790,7 @@ void thread_3SAT(__int64 tid, bool* arr, __int64** lst, __int64 k_parm, __int64 
         done = sat;
         if (sat)
             sol_id = tid;
-        thread_id = tid;
+        simp_vector_append (&thread_id, &thread_id_top, &thread_id_cap, tid);
         cv.notify_all();
     }
 
@@ -797,6 +799,10 @@ void thread_3SAT(__int64 tid, bool* arr, __int64** lst, __int64 k_parm, __int64 
 }
 
 bool SATSolver_threads(__int64** lst, __int64 k_parm, __int64 n_parm, bool* arr) {
+
+    thread_id_cap = 16;
+    thread_id_top = -1;
+    thread_id = simp_vector_create(16);
 
     __int64 num_threads = std::thread::hardware_concurrency();
     if (num_threads <= 0) num_threads = 1;
@@ -844,11 +850,18 @@ bool SATSolver_threads(__int64** lst, __int64 k_parm, __int64 n_parm, bool* arr)
             std::unique_lock<std::mutex> lock(m);
             cv.wait(lock, [] {return !ready; });
 
-            if (thread_id >= 0 && thread_id < num_threads && threadblock[thread_id] && threadblock[thread_id]->joinable()) {
+            __int64 tid = thread_id[0];
 
-                threadblock[thread_id]->join();
-                delete threadblock[thread_id];
-                threadblock[thread_id] = nullptr;
+            for (__int64 i = 0; i < thread_id_top; i++)
+                thread_id[i] = thread_id[i + 1];
+
+            thread_id_top--;
+
+            if (tid >= 0 && tid < num_threads && threadblock[tid] && threadblock[tid]->joinable()) {
+
+                threadblock[tid]->join();
+                delete threadblock[tid];
+                threadblock[tid] = nullptr;
                 active_threads--;
             }
             
@@ -859,7 +872,7 @@ bool SATSolver_threads(__int64** lst, __int64 k_parm, __int64 n_parm, bool* arr)
             if (active_threads == 0 && pos == search_sz)
                 done = true;
             if (pos < search_sz) {
-                threadblock[thread_id] = new std::thread(thread_3SAT, thread_id, arrs[thread_id], lst, k_parm, n_parm, chops, pos);
+                threadblock[tid] = new std::thread(thread_3SAT, tid, arrs[tid], lst, k_parm, n_parm, chops, pos);
                 active_threads++;
                 pos++;
                 ready = true;
