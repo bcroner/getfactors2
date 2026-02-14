@@ -2380,9 +2380,9 @@ char* nat_get_factors(char* c_str, __int64 c_str_buf_sz, __int64 * len_para) {
 
     bool is_sat = false;
 
-    is_sat = SATSolver_threads(input, k, num_para, sln);
+    //is_sat = SATSolver_threads(input, k, num_para, sln);
 
-    /*
+    //*
 
     for (__int64 i = 0; i < 128; i++) {
 
