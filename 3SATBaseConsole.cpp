@@ -41,11 +41,11 @@ void simp_vector_append(__int64** v, __int64* vtop, __int64* vcap, __int64 data)
         for (__int64 i = 0; i < *vcap * 2; i++)
             newv[i] = 0;
         for (__int64 i = 0; i < *vcap; i++)
-            newv[i] = *v[i];
+            newv[i] = (*v)[i];
         *vcap = *vcap * 2;
-        delete[] * v;
+        delete[](*v);
         *v = newv;
-        *v[*vtop] = data;
+        (*v)[*vtop] = data;
     }
 
 }
@@ -84,9 +84,9 @@ void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n, __int64
 
     s->Z = SATSolver_create_boundary(true, chops, chop, n);
 
-    s->inopcell_l = new __int64 [k];
-    s->inopcell_m = new __int64 [k];
-    s->inopcell_r = new __int64 [k];
+    s->inopcell_l = new __int64[k];
+    s->inopcell_m = new __int64[k];
+    s->inopcell_r = new __int64[k];
 
     // copy instance into SATSolver vectors
 
@@ -201,7 +201,7 @@ void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n, __int64
                     s->cd_sizes_t[i]++;
             }
             else {
-                
+
                 simp_vector_append(&(s->cdopcelll_f[i]), &(s->cdol_vtop_f[i]), &(s->cdol_vcap_f[i]), left_val);
                 simp_vector_append(&(s->cdopcellr_f[i]), &(s->cdor_vtop_f[i]), &(s->cdor_vcap_f[i]), right_val);
 
@@ -260,7 +260,7 @@ bool bool_equals(bool* A, bool* B, __int64 n) {
 }
 
 
-bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n_parm, bool * is_f, bool * is_t) {
+bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n_parm, bool* is_f, bool* is_t) {
 
     /*
     for (__int64 i = 0; i < k_parm; i++)
@@ -366,7 +366,7 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
             simp_vector_append(&(true_implies[r_abs]), &(true_implies_top[r_abs]), &(true_implies_cap[r_abs]), lst_l[i]);
         else
             simp_vector_append(&(false_implies[r_abs]), &(false_implies_top[r_abs]), &(false_implies_cap[r_abs]), lst_l[i]);
-            
+
     }
 
     bool is_sat = false;
@@ -446,7 +446,7 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
                     }
             }
         } while (changed);
-            
+
         bool contradiction = false;
 
         for (__int64 i = 2; i < n; i++)
@@ -798,8 +798,9 @@ void thread_3SAT(__int64 tid, bool* arr, __int64** lst, __int64 k_parm, __int64 
 
 bool SATSolver_threads(__int64** lst, __int64 k_parm, __int64 n_parm, bool* arr) {
 
-    __int64 num_threads = std::thread::hardware_concurrency() ;
-    
+    __int64 num_threads = std::thread::hardware_concurrency();
+    if (num_threads <= 0) num_threads = 1;
+
     std::thread** threadblock = new std::thread * [num_threads];
 
     for (__int64 i = 0; i < num_threads; i++)
@@ -842,10 +843,17 @@ bool SATSolver_threads(__int64** lst, __int64 k_parm, __int64 n_parm, bool* arr)
         {
             std::unique_lock<std::mutex> lock(m);
             cv.wait(lock, [] {return !ready; });
-            threadblock[thread_id]->join();
-            delete threadblock[thread_id];
-            active_threads--;
+
+            if (thread_id >= 0 && thread_id < num_threads && threadblock[thread_id] && threadblock[thread_id]->joinable()) {
+
+                threadblock[thread_id]->join();
+                delete threadblock[thread_id];
+                threadblock[thread_id] = nullptr;
+                active_threads--;
+            }
+            
             solved = done;
+
             if (solved)
                 break;
             if (active_threads == 0 && pos == search_sz)
@@ -868,8 +876,10 @@ bool SATSolver_threads(__int64** lst, __int64 k_parm, __int64 n_parm, bool* arr)
 
     for (__int64 i = 0; i < num_threads; i++) {
 
-        threadblock[i]->join();
-        delete threadblock[i];
+        if (threadblock[i] && threadblock[i]->joinable()) {
+            threadblock[i]->join();
+            delete threadblock[i];
+        }
     }
 
     delete[] threadblock;
