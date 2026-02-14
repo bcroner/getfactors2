@@ -771,6 +771,8 @@ bool done = false;
 bool ready = true;
 bool solved = false;
 __int64 thread_id = -1;
+__int64 sol_id = -1;
+__int64 active_threads = 0;
 
 void thread_3SAT(__int64 tid, bool* arr, __int64** lst, __int64 k_parm, __int64 n_parm, __int64 chops, __int64 chop) {
 
@@ -784,6 +786,8 @@ void thread_3SAT(__int64 tid, bool* arr, __int64** lst, __int64 k_parm, __int64 
         cv.wait(lock, [] {return ready; });
         ready = false;
         done = sat;
+        if (sat)
+            sol_id = tid;
         thread_id = tid;
         cv.notify_all();
     }
@@ -829,8 +833,10 @@ bool SATSolver_threads(__int64** lst, __int64 k_parm, __int64 n_parm, bool* arr)
 
 
     __int64 pos = 0;
-    for (pos = 0; pos < num_threads; pos++)
+    for (pos = 0; pos < num_threads; pos++) {
         threadblock[pos] = new std::thread(thread_3SAT, pos, arrs[pos], lst, k_parm, n_parm, chops, pos);
+        active_threads++;
+    }
 
     do {
         {
@@ -838,17 +844,21 @@ bool SATSolver_threads(__int64** lst, __int64 k_parm, __int64 n_parm, bool* arr)
             cv.wait(lock, [] {return !ready; });
             threadblock[thread_id]->join();
             delete threadblock[thread_id];
+            active_threads--;
             solved = done;
             if (solved)
                 break;
+            if (active_threads == 0 && pos == search_sz)
+                done = true;
             if (pos < search_sz) {
                 threadblock[thread_id] = new std::thread(thread_3SAT, thread_id, arrs[thread_id], lst, k_parm, n_parm, chops, pos);
+                active_threads++;
                 pos++;
                 ready = true;
                 cv.notify_all();
             }
         }
-    } while (pos < search_sz && !solved);
+    } while (!done);
 
     //*/
 

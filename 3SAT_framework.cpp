@@ -2384,14 +2384,20 @@ char* nat_get_factors(char* c_str, __int64 c_str_buf_sz, __int64 * len_para) {
 
     //*
 
-    SATSolver* s = new SATSolver();
-    SATSolver_create(s, input, k, num_para, 0, 0);
+    for (__int64 i = 0; i < 128; i++) {
 
-    is_sat = SATSolver_isSat(s, sln);
-        
-    SATSolver_destroy(s);
+        SATSolver* s = new SATSolver();
+        SATSolver_create(s, input, k, num_para, 7, i);
 
-    delete s;
+        is_sat = SATSolver_isSat(s, sln);
+
+        SATSolver_destroy(s);
+
+        delete s;
+
+        if (is_sat)
+            break;
+    }
 
     //*/
 
