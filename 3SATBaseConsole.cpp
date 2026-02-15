@@ -899,11 +899,13 @@ bool SATSolver_threads(__int64** lst, __int64 k_parm, __int64 n_parm, bool* arr)
         list.push_back(pool_of_consumers.schedule(thread_3SAT, arr, &is_sat, lst, k_parm, n_parm, chops, i));
     }
 
+    //pool_of_consumers.await();
+
+    //*
     // Waiting for the consumers to complete.
     for (std::future<void>& future : list) {
         future.wait();
     }
-
     //*/
 
     return is_sat;
