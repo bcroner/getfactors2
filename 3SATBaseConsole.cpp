@@ -788,6 +788,9 @@ int dummy() {
 
 void thread_3SAT(bool* arr, bool* is_sat, __int64** lst, __int64 k_parm, __int64 n_parm, __int64 chops, __int64 chop) {
 
+    if (*is_sat)
+        return;
+
     SATSolver* s = new SATSolver();
     SATSolver_create(s, lst, k_parm, n_parm, chops, chop);
 
