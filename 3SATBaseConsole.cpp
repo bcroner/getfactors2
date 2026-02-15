@@ -867,6 +867,8 @@ bool SATSolver_threads(__int64** lst, __int64 k_parm, __int64 n_parm, bool* arr)
 
     bool is_sat = false;
 
+    /*
+
     // Create pool with 3 threads
     ThreadPool pool(num_threads);
 
@@ -882,15 +884,15 @@ bool SATSolver_threads(__int64** lst, __int64 k_parm, __int64 n_parm, bool* arr)
     
     pool.shutdown();
 
-    /*
+    //*/
+
+    //*
 
     // A list of futures.
     std::list<std::future<void>> list;
 
     // Producer and consumer thread pools.
     thread::pool::parameterized_pool_t<1, 0> pool_of_consumers(num_threads);
-
-    bool is_sat = false;
 
     // Scheduling the producers.
     for (__int64 i = 0; i < search_sz; i++) {
