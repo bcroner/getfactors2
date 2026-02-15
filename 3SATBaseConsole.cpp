@@ -5,8 +5,14 @@
 #define __3SATBASECONSOLE_C__
 
 #include "3SATBaseConsole.hpp"
-#include "ThreadPool.h"
 
+#include <iostream>
+#include <set>
+#include <future>
+#include <list>
+#include <random>
+#include "thread_pool.hpp"
+#include "thread_pool_callable.hpp"
 #include <stdio.h>
 #include <thread>
 #include <condition_variable>
@@ -782,10 +788,6 @@ __int64 sol_id = -1;
 __int64 active_threads = 0;
 //*/
 
-int dummy() {
-    return 0;
-}
-
 void thread_3SAT(bool* arr, bool* is_sat, __int64** lst, __int64 k_parm, __int64 n_parm, __int64 chops, __int64 chop) {
 
     if (*is_sat)
@@ -858,22 +860,23 @@ bool SATSolver_threads(__int64** lst, __int64 k_parm, __int64 n_parm, bool* arr)
     for (__int64 i = 0; i < chops; i++)
         search_sz *= 2;
 
-    ThreadPool pool(num_threads);
+    // A list of futures.
+    std::list<std::future<void>> list;
 
-    // Initialize pool
-    pool.init();
+    // Producer and consumer thread pools.
+    thread::pool::parameterized_pool_t<1, 0> pool_of_consumers(num_threads);
 
     bool is_sat = false;
 
-    for (__int64 i = 0 ; i < search_sz; i++)
-        pool.submit(thread_3SAT, arr, &is_sat, lst, k_parm, n_parm, chops, i);
+    // Scheduling the producers.
+    for (__int64 i = 0; i < search_sz; i++) {
+        list.push_back(pool_of_consumers.schedule(thread_3SAT, arr, &is_sat, lst, k_parm, n_parm, chops, i));
+    }
 
-    auto future1 = pool.submit(dummy);
-
-    // Wait for dummy output to finish
-    future1.get();
-
-    pool.shutdown();
+    // Waiting for the consumers to complete.
+    for (std::future<void>& future : list) {
+        future.wait();
+    }
 
     return is_sat;
 
