@@ -782,12 +782,16 @@ __int64 sol_id = -1;
 __int64 active_threads = 0;
 //*/
 
-void thread_3SAT(bool* arr, bool* sat, __int64** lst, __int64 k_parm, __int64 n_parm, __int64 chops, __int64 chop) {
+int dummy() {
+    return 0;
+}
+
+void thread_3SAT(bool* arr, bool* is_sat, __int64** lst, __int64 k_parm, __int64 n_parm, __int64 chops, __int64 chop) {
 
     SATSolver* s = new SATSolver();
     SATSolver_create(s, lst, k_parm, n_parm, chops, chop);
 
-    *sat |= SATSolver_isSat(s, arr);
+    *is_sat |= SATSolver_isSat(s, arr);
 
     /*
 
@@ -860,6 +864,11 @@ bool SATSolver_threads(__int64** lst, __int64 k_parm, __int64 n_parm, bool* arr)
 
     for (__int64 i = 0 ; i < search_sz; i++)
         pool.submit(thread_3SAT, arr, &is_sat, lst, k_parm, n_parm, chops, i);
+
+    auto future1 = pool.submit(dummy);
+
+    // Wait for dummy output to finish
+    future1.get();
 
     pool.shutdown();
 
