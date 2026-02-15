@@ -17,6 +17,7 @@
 #include <thread>
 #include <condition_variable>
 #include <mutex>
+#include "ThreadPool.h"
 
 #define LVAL 0
 #define MVAL 1
@@ -788,6 +789,10 @@ __int64 sol_id = -1;
 __int64 active_threads = 0;
 //*/
 
+int dummy() {
+    return 0;
+}
+
 void thread_3SAT(bool* arr, bool* is_sat, __int64** lst, __int64 k_parm, __int64 n_parm, __int64 chops, __int64 chop) {
 
     if (*is_sat)
@@ -860,6 +865,25 @@ bool SATSolver_threads(__int64** lst, __int64 k_parm, __int64 n_parm, bool* arr)
     for (__int64 i = 0; i < chops; i++)
         search_sz *= 2;
 
+    bool is_sat = false;
+
+    // Create pool with 3 threads
+    ThreadPool pool(num_threads);
+
+    // Initialize pool
+    pool.init();
+
+    for (__int64 i = 0; i < search_sz; i++)
+        pool.submit(thread_3SAT, arr, &is_sat, lst, k_parm, n_parm, chops, i);
+
+    auto future1 = pool.submit(dummy);
+
+    future1.get();
+    
+    pool.shutdown();
+
+    /*
+
     // A list of futures.
     std::list<std::future<void>> list;
 
@@ -877,6 +901,8 @@ bool SATSolver_threads(__int64** lst, __int64 k_parm, __int64 n_parm, bool* arr)
     for (std::future<void>& future : list) {
         future.wait();
     }
+
+    //*/
 
     return is_sat;
 
