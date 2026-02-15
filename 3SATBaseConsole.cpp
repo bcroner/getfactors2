@@ -17,7 +17,6 @@
 #include <thread>
 #include <condition_variable>
 #include <mutex>
-#include "ThreadPool.h"
 
 #define LVAL 0
 #define MVAL 1
@@ -893,8 +892,9 @@ bool SATSolver_threads(__int64** lst, __int64 k_parm, __int64 n_parm, bool* arr)
 
     // Producer and consumer thread pools.
     thread::pool::parameterized_pool_t<1, 0> pool_of_consumers(num_threads);
+    //thread::pool::pool_t pool_of_consumers(num_threads);
 
-    // Scheduling the producers.
+    // Scheduling the consumers
     for (__int64 i = 0; i < search_sz; i++) {
         list.push_back(pool_of_consumers.schedule(thread_3SAT, arr, &is_sat, lst, k_parm, n_parm, chops, i));
     }
