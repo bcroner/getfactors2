@@ -858,7 +858,6 @@ bool SATSolver_threads(__int64** lst, __int64 k_parm, __int64 n_parm, bool* arr)
 
     bool is_sat = false;
 
-    // Submit (partial) multiplication table
     for (__int64 i = 0 ; i < search_sz; i++)
         pool.submit(thread_3SAT, arr, lst, &is_sat, k_parm, n_parm, chops, i);
 
