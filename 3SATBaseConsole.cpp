@@ -802,7 +802,7 @@ void thread_3SAT(bool* arr, __int64** lst, bool *sat, __int64 k_parm, __int64 n_
         cv.notify_all();
     }
 
-    */
+    //*/
 
     SATSolver_destroy(s);
     delete s;
