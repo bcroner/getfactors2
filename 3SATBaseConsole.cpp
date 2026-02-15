@@ -5,6 +5,7 @@
 #define __3SATBASECONSOLE_C__
 
 #include "3SATBaseConsole.hpp"
+#include "ThreadPool.h"
 
 #include <stdio.h>
 #include <thread>
@@ -514,6 +515,8 @@ bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n
     return is_sat;
 }
 
+std::mutex mtx;
+
 bool SATSolver_isSat(SATSolver* s, bool* sln) {
 
     bool* always_f = new bool[s->n];
@@ -724,11 +727,12 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
 
         if (is_2sat_sat && ix == 2) {
 
-            for (__int64 i = 2; i < s->n; i++) {
-                sln[i] = s->Z[i];
-                //printf_s("%lld ", sln[i] ? i : -i);
+            {
+                std::lock_guard<std::mutex> lock(mtx);
+
+                for (__int64 i = 2; i < s->n; i++)
+                    sln[i] = s->Z[i];
             }
-            //printf_s("\n");
 
             is_sat = true;
 
@@ -765,6 +769,7 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
     return is_sat;
 }
 
+/*
 std::mutex m;
 std::condition_variable cv;
 bool done = false;
@@ -775,13 +780,16 @@ __int64 thread_id_top;
 __int64 thread_id_cap;
 __int64 sol_id = -1;
 __int64 active_threads = 0;
+//*/
 
-void thread_3SAT(__int64 tid, bool* arr, __int64** lst, __int64 k_parm, __int64 n_parm, __int64 chops, __int64 chop) {
+void thread_3SAT(bool* arr, __int64** lst, bool *sat, __int64 k_parm, __int64 n_parm, __int64 chops, __int64 chop) {
 
     SATSolver* s = new SATSolver();
     SATSolver_create(s, lst, k_parm, n_parm, chops, chop);
 
-    bool sat = SATSolver_isSat(s, arr);
+    *sat = SATSolver_isSat(s, arr);
+
+    /*
 
     {
         std::unique_lock<std::mutex> lock(m);
@@ -794,18 +802,24 @@ void thread_3SAT(__int64 tid, bool* arr, __int64** lst, __int64 k_parm, __int64 
         cv.notify_all();
     }
 
+    */
+
     SATSolver_destroy(s);
     delete s;
 }
 
 bool SATSolver_threads(__int64** lst, __int64 k_parm, __int64 n_parm, bool* arr) {
 
+    /*
     thread_id_cap = 16;
     thread_id_top = -1;
     thread_id = simp_vector_create(16);
+    //*/
 
     __int64 num_threads = std::thread::hardware_concurrency();
     if (num_threads <= 0) num_threads = 1;
+
+    /*
 
     std::thread** threadblock = new std::thread * [num_threads];
 
@@ -822,6 +836,8 @@ bool SATSolver_threads(__int64** lst, __int64 k_parm, __int64 n_parm, bool* arr)
 
     // get the right number of chops- at least 2^chops
 
+    //*/
+
     __int64 chops = 0;
     __int64 counter = 1;
 
@@ -830,13 +846,27 @@ bool SATSolver_threads(__int64** lst, __int64 k_parm, __int64 n_parm, bool* arr)
 
     chops += 2;
 
-
-    ///*
-
     __int64 search_sz = 1;
 
     for (__int64 i = 0; i < chops; i++)
         search_sz *= 2;
+
+    ThreadPool pool(num_threads);
+
+    // Initialize pool
+    pool.init();
+
+    bool is_sat = false;
+
+    // Submit (partial) multiplication table
+    for (__int64 i = 0 ; i < search_sz; i++)
+        pool.submit(thread_3SAT, arr, lst, &is_sat, k_parm, n_parm, chops, i);
+
+    pool.shutdown();
+
+    return is_sat;
+
+    /*
 
 
     __int64 pos = 0;
@@ -883,6 +913,8 @@ bool SATSolver_threads(__int64** lst, __int64 k_parm, __int64 n_parm, bool* arr)
 
     //*/
 
+    /*
+
     if (solved)
         for (__int64 i = 0; i < n_parm; i++)
             arr[i] = arrs[sol_id][i];
@@ -905,6 +937,8 @@ bool SATSolver_threads(__int64** lst, __int64 k_parm, __int64 n_parm, bool* arr)
     delete[] arrs;
 
     return solved;
+
+    //*/
 }
 
 #endif
