@@ -775,23 +775,6 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
     return is_sat;
 }
 
-/*
-std::mutex m;
-std::condition_variable cv;
-bool done = false;
-bool ready = true;
-bool solved = false;
-__int64 *thread_id;
-__int64 thread_id_top;
-__int64 thread_id_cap;
-__int64 sol_id = -1;
-__int64 active_threads = 0;
-//*/
-
-int dummy() {
-    return 0;
-}
-
 void thread_3SAT(bool* arr, bool* is_sat, __int64** lst, __int64 k_parm, __int64 n_parm, __int64 chops, __int64 chop) {
 
     if (*is_sat)
@@ -802,54 +785,14 @@ void thread_3SAT(bool* arr, bool* is_sat, __int64** lst, __int64 k_parm, __int64
 
     *is_sat |= SATSolver_isSat(s, arr);
 
-    /*
-
-    {
-        std::unique_lock<std::mutex> lock(m);
-        cv.wait(lock, [] {return ready; });
-        ready = false;
-        done = sat;
-        if (sat)
-            sol_id = tid;
-        simp_vector_append (&thread_id, &thread_id_top, &thread_id_cap, tid);
-        cv.notify_all();
-    }
-
-    //*/
-
     SATSolver_destroy(s);
     delete s;
 }
 
 bool SATSolver_threads(__int64** lst, __int64 k_parm, __int64 n_parm, bool* arr) {
 
-    /*
-    thread_id_cap = 16;
-    thread_id_top = -1;
-    thread_id = simp_vector_create(16);
-    //*/
-
     __int64 num_threads = std::thread::hardware_concurrency();
     if (num_threads <= 0) num_threads = 1;
-
-    /*
-
-    std::thread** threadblock = new std::thread * [num_threads];
-
-    for (__int64 i = 0; i < num_threads; i++)
-        threadblock[i] = NULL;
-
-    bool** arrs = new bool* [num_threads];
-
-    for (__int64 i = 0; i < num_threads; i++) {
-        arrs[i] = new bool[n_parm];
-        for (__int64 j = 0; j < n_parm; j++)
-            arrs[i][j] = false;
-    }
-
-    // get the right number of chops- at least 2^chops
-
-    //*/
 
     __int64 chops = 0;
     __int64 counter = 1;
@@ -866,123 +809,21 @@ bool SATSolver_threads(__int64** lst, __int64 k_parm, __int64 n_parm, bool* arr)
 
     bool is_sat = false;
 
-    /*
-
-    // Create pool with 3 threads
-    ThreadPool pool(num_threads);
-
-    // Initialize pool
-    pool.init();
-
-    for (__int64 i = 0; i < search_sz; i++)
-        pool.submit(thread_3SAT, arr, &is_sat, lst, k_parm, n_parm, chops, i);
-
-    auto future1 = pool.submit(dummy);
-
-    future1.get();
-    
-    pool.shutdown();
-
-    //*/
-
-    //*
-
     // A list of futures.
     std::list<std::future<void>> list;
 
     // Producer and consumer thread pools.
     thread::pool::parameterized_pool_t<1, 0> pool_of_consumers(num_threads);
-    //thread::pool::pool_t pool_of_consumers(num_threads);
 
     // Scheduling the consumers
-    for (__int64 i = 0; i < search_sz; i++) {
+    for (__int64 i = 0; i < search_sz; i++)
         list.push_back(pool_of_consumers.schedule(thread_3SAT, arr, &is_sat, lst, k_parm, n_parm, chops, i));
-    }
 
-    //pool_of_consumers.await();
-
-    //*
     // Waiting for the consumers to complete.
-    for (std::future<void>& future : list) {
+    for (std::future<void>& future : list)
         future.wait();
-    }
-    //*/
 
     return is_sat;
-
-    /*
-
-
-    __int64 pos = 0;
-    for (pos = 0; pos < num_threads; pos++) {
-        threadblock[pos] = new std::thread(thread_3SAT, pos, arrs[pos], lst, k_parm, n_parm, chops, pos);
-        active_threads++;
-    }
-
-    do {
-        {
-            std::unique_lock<std::mutex> lock(m);
-            cv.wait(lock, [] {return !ready; });
-
-            __int64 tid = thread_id[0];
-
-            for (__int64 i = 0; i < thread_id_top; i++)
-                thread_id[i] = thread_id[i + 1];
-
-            thread_id_top--;
-
-            if (tid >= 0 && tid < num_threads && threadblock[tid] && threadblock[tid]->joinable()) {
-
-                threadblock[tid]->join();
-                delete threadblock[tid];
-                threadblock[tid] = nullptr;
-                active_threads--;
-            }
-            
-            solved = done;
-
-            if (solved)
-                break;
-            if (active_threads == 0 && pos == search_sz)
-                done = true;
-            if (pos < search_sz) {
-                threadblock[tid] = new std::thread(thread_3SAT, tid, arrs[tid], lst, k_parm, n_parm, chops, pos);
-                active_threads++;
-                pos++;
-                ready = true;
-                cv.notify_all();
-            }
-        }
-    } while (!done);
-
-    //*/
-
-    /*
-
-    if (solved)
-        for (__int64 i = 0; i < n_parm; i++)
-            arr[i] = arrs[sol_id][i];
-
-    for (__int64 i = 0; i < num_threads; i++) {
-
-        if (threadblock[i] && threadblock[i]->joinable()) {
-            threadblock[i]->join();
-            delete threadblock[i];
-        }
-    }
-
-    delete[] threadblock;
-
-    // free up master resources
-
-    for (__int64 i = 0; i < num_threads; i++)
-        delete[] arrs[i];
-
-    delete[] arrs;
-
-    return solved;
-
-    //*/
 }
 
 #endif
