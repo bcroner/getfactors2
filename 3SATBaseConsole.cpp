@@ -80,8 +80,8 @@ bool* SATSolver_create_boundary(bool begin, __int64 chop, __int64 offs, __int64 
             ret[n - 1 - leading_trues - i] = false;
     }
 
-    for (__int64 i = leading_trues + chop; i < n; i++)
-        ret[n - 1 - i] = begin ? false : true;
+    for (__int64 i = 0; i < n - leading_trues - chop; i++)
+        ret[i] = begin ? false : true;
 
     return ret;
 
