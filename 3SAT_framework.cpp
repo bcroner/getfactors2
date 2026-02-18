@@ -1180,7 +1180,7 @@ char* dec_equals(__int64 * num_para, dec_3sat* a, dec_3sat* b, bool eq, __int64*
 
 }
 
-char* nat_equals(__int64 * num_para, nat_3sat* a, nat_3sat* b, bool eq, __int64* len_para) {
+char* nat_equals(__int64 * num_para, nat_3sat* a, nat_3sat* b, bool eq, __int64* len_para, __int64* leading_trues) {
 
     // c = a xnor b
     // d = and all c bits together
@@ -1225,6 +1225,8 @@ char* nat_equals(__int64 * num_para, nat_3sat* a, nat_3sat* b, bool eq, __int64*
     nat_3sat* c = new nat_3sat();
     c->sz = num_sz ;
     c->bits = new bit_3sat * [num_sz];
+
+    __int64 first = *num_para;
 
     for (__int64 i = 0; i < num_sz; i++) {
 
@@ -1278,6 +1280,8 @@ char* nat_equals(__int64 * num_para, nat_3sat* a, nat_3sat* b, bool eq, __int64*
         pos += force_to_str_len;
     }
 
+	__int64 last = *num_para;
+
     /*
 
     bit_3sat* g = NULL;
@@ -1294,6 +1298,8 @@ char* nat_equals(__int64 * num_para, nat_3sat* a, nat_3sat* b, bool eq, __int64*
     if (force_to_str != NULL)
         delete force_to_str;
 
+    *leading_trues = last - first;
+
     return ret;
 
 }
@@ -1306,9 +1312,9 @@ char* dec_not_equals(__int64 * num_para, dec_3sat* a, dec_3sat* b, __int64 *len_
 
 }
 
-char* nat_not_equals(__int64 * num_para, nat_3sat* a, nat_3sat* b, __int64* len_para) {
+char* nat_not_equals(__int64 * num_para, nat_3sat* a, nat_3sat* b, __int64* len_para, __int64* leading_trues) {
 
-    return nat_equals(num_para, a, b, false, len_para);
+    return nat_equals(num_para, a, b, false, len_para, leading_trues);
 
 }
 
@@ -2224,7 +2230,7 @@ char* dec_get_factors(char* c_str, __int64 c_str_buf_sz, __int64 * len_para) {
     bool is_sat = false;
 
     SATSolver* s = new SATSolver();
-    SATSolver_create(s, input, k, num_para, 0, 0);
+    SATSolver_create(s, input, k, num_para, 0, 0, 0);
 
     is_sat = SATSolver_isSat(s, sln);
 
@@ -2319,9 +2325,10 @@ char* nat_get_factors(char* c_str, __int64 c_str_buf_sz, __int64 * len_para) {
 
     char* mul_str = nat_mul(&num_para, &c, a, b, a->sz + b->sz, &mul_str_len);
 
+	__int64 leading_trues = 0;
     __int64 equals_str_len = 0;
 
-    char* equals_str = nat_equals(&num_para, c, c_equals, true, &equals_str_len);
+    char* equals_str = nat_equals(&num_para, c, c_equals, true, &equals_str_len, &leading_trues);
 
     __int64 buf_3sat_sz = mul_str_len + equals_str_len + 1;
     char* buf_3sat = new char[buf_3sat_sz];
@@ -2380,7 +2387,7 @@ char* nat_get_factors(char* c_str, __int64 c_str_buf_sz, __int64 * len_para) {
 
     bool is_sat = false;
 
-    is_sat = SATSolver_threads(input, k, num_para, sln);
+    is_sat = SATSolver_threads(input, k, num_para, sln, leading_trues);
 
     if (!is_sat)
         return prime_str;

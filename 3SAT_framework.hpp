@@ -77,9 +77,9 @@ char* dec_sub(__int64 * num_para, dec_3sat** c, dec_3sat* a, dec_3sat* b, __int6
 
 char* dec_equals(__int64 * num_para, dec_3sat* a, dec_3sat* b, bool eq, __int64* len_para);
 
-char* nat_equals(__int64 * num_para, nat_3sat* a, nat_3sat* b, bool eq, __int64* len_para);
+char* nat_equals(__int64 * num_para, nat_3sat* a, nat_3sat* b, bool eq, __int64* len_para, __int64* leading_trues);
 
-char* dec_not_equals(__int64 * num_para, dec_3sat* a, dec_3sat* b, __int64* len_para);
+char* dec_not_equals(__int64 * num_para, dec_3sat* a, dec_3sat* b, __int64* len_para, __int64* leading_trues);
 
 char* nat_not_equals(__int64 * num_para, nat_3sat* a, nat_3sat* b, __int64* len_para);
 

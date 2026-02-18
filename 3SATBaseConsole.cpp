@@ -57,9 +57,14 @@ void simp_vector_append(__int64** v, __int64* vtop, __int64* vcap, __int64 data)
 
 }
 
-bool* SATSolver_create_boundary(bool begin, __int64 chop, __int64 offs, __int64 n) {
+bool* SATSolver_create_boundary(bool begin, __int64 chop, __int64 offs, __int64 n, __int64 leading_trues) {
 
     bool* ret = new bool[n];
+
+    for (__int64 i = 0; i < leading_trues; i++)
+		ret[i] = false;
+	for (__int64 i = n - leading_trues; i < n; i++)
+		ret[i] = true;
 
     for (__int64 i = 0; i < chop; i++) {
 
@@ -68,28 +73,30 @@ bool* SATSolver_create_boundary(bool begin, __int64 chop, __int64 offs, __int64 
             pow2 *= 2;
 
         if (offs >= pow2) {
-            ret[n - 1 - i] = true;
+            ret[n - 1 - leading_trues - i] = true;
             offs -= pow2;
         }
         else
-            ret[n - 1 - i] = false;
+            ret[n - 1 - leading_trues - i] = false;
     }
 
-    for (__int64 i = chop; i < n; i++)
+    for (__int64 i = leading_trues + chop; i < n; i++)
         ret[n - 1 - i] = begin ? false : true;
 
     return ret;
 
 }
 
-void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n, __int64 chops, __int64 chop) {
+void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n, __int64 chops, __int64 chop, __int64 leading_trues) {
 
     s->k = k;
     s->n = n;
 
     s->chops = chops;
 
-    s->Z = SATSolver_create_boundary(true, chops, chop, n);
+    s->leading_trues = leading_trues;
+
+    s->Z = SATSolver_create_boundary(true, chops, chop, n, leading_trues);
 
     s->inopcell_l = new __int64[k];
     s->inopcell_m = new __int64[k];
@@ -268,12 +275,6 @@ bool bool_equals(bool* A, bool* B, __int64 n) {
 
 
 bool two_sat(__int64* lst_l_parm, __int64* lst_r_parm, __int64 k_parm, __int64 n_parm, bool* is_f, bool* is_t) {
-
-    /*
-    for (__int64 i = 0; i < k_parm; i++)
-        printf_s("%lld: %lld %lld\n", i, lst_l_parm[i], lst_r_parm[i]);
-    printf_s("\n");
-    //*/
 
     __int64* encoding = new __int64[n_parm]; // from 2..n_parm to 2..n
 
@@ -562,7 +563,7 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
             always_t[val_abs] = true;
 
     }
-    __int64 ix = s->n - 1 - s->chops;
+    __int64 ix = s->n - s->leading_trues - s->chops - 1;
 
     for (__int64 i = s->n - 1; i > ix; i--)
         if ((s->Z[i] && always_f[i]) || (!s->Z[i] && always_t[i])) {
@@ -763,7 +764,7 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
                 s->Z[i] = false;
         }
 
-        if (ix >= s->n - s->chops)
+        if (ix >= s->n - s->leading_trues - s->chops)
             break;
     }
 
@@ -775,13 +776,13 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
     return is_sat;
 }
 
-void thread_3SAT(bool* arr, bool* is_sat, __int64** lst, __int64 k_parm, __int64 n_parm, __int64 chops, __int64 chop) {
+void thread_3SAT(bool* arr, bool* is_sat, __int64** lst, __int64 k_parm, __int64 n_parm, __int64 chops, __int64 chop, __int64 leading_trues) {
 
     if (*is_sat)
         return;
 
     SATSolver* s = new SATSolver();
-    SATSolver_create(s, lst, k_parm, n_parm, chops, chop);
+    SATSolver_create(s, lst, k_parm, n_parm, chops, chop, leading_trues);
 
     *is_sat |= SATSolver_isSat(s, arr);
 
@@ -789,7 +790,7 @@ void thread_3SAT(bool* arr, bool* is_sat, __int64** lst, __int64 k_parm, __int64
     delete s;
 }
 
-bool SATSolver_threads(__int64** lst, __int64 k_parm, __int64 n_parm, bool* arr) {
+bool SATSolver_threads(__int64** lst, __int64 k_parm, __int64 n_parm, bool* arr, __int64 leading_trues) {
 
     __int64 num_threads = std::thread::hardware_concurrency();
     if (num_threads <= 0) num_threads = 1;
@@ -800,7 +801,7 @@ bool SATSolver_threads(__int64** lst, __int64 k_parm, __int64 n_parm, bool* arr)
     for (counter = 1; counter < num_threads; counter *= 2)
         chops++;
 
-    chops += 2;
+    chops += 8;
 
     __int64 search_sz = 1;
 
@@ -816,8 +817,9 @@ bool SATSolver_threads(__int64** lst, __int64 k_parm, __int64 n_parm, bool* arr)
     thread::pool::parameterized_pool_t<1, 0> pool_of_consumers(num_threads);
 
     // Scheduling the consumers
-    for (__int64 i = 0; i < search_sz; i++)
-        list.push_back(pool_of_consumers.schedule(thread_3SAT, arr, &is_sat, lst, k_parm, n_parm, chops, i));
+    for (__int64 i = 0; i < search_sz; i++) {
+        list.push_back(pool_of_consumers.schedule(thread_3SAT, arr, &is_sat, lst, k_parm, n_parm, chops, i, leading_trues));
+    }
 
     // Waiting for the consumers to complete.
     for (std::future<void>& future : list)
