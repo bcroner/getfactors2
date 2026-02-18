@@ -615,6 +615,7 @@ int main()
     //strcpy_s(c_str, 2000, "8");
     //strcpy_s(c_str, 2000, "F");
     strcpy_s(c_str, 2000, "8F");
+    strcpy_s(c_str, 2000, "645e3c9a93e8328f1a5679a52d9ec550bba8218ae210e239e7d6a335c345f26a");
     //strcpy_s(c_str, 2000, "7a9");
     //strcpy_s(c_str, 2000, "1EEF");
     //char * factors = dec_get_factors(c_str, 2000, & len_para);
