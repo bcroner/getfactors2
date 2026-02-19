@@ -807,7 +807,7 @@ bool SATSolver_threads(__int64** lst, __int64 k_parm, __int64 n_parm, bool* arr,
     for (counter = 1; counter < num_threads; counter *= 2)
         chops++;
 
-    chops += 2;
+    //chops += 2;
 
     __int64 search_sz = 1;
 
