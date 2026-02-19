@@ -2260,7 +2260,7 @@ char* dec_get_factors(char* c_str, __int64 c_str_buf_sz, __int64 * len_para) {
     return ret_buf;
 }
 
-char* nat_get_factors(char* c_str, __int64 c_str_buf_sz, __int64 * len_para) {
+char* nat_get_factors(char* c_str, __int64 c_str_buf_sz, __int64* len_para) {
 
     if (c_str == NULL or c_str == "")
         return NULL;
@@ -2325,7 +2325,7 @@ char* nat_get_factors(char* c_str, __int64 c_str_buf_sz, __int64 * len_para) {
 
     char* mul_str = nat_mul(&num_para, &c, a, b, a->sz + b->sz, &mul_str_len);
 
-	__int64 leading_trues = 0;
+    __int64 leading_trues = 0;
     __int64 equals_str_len = 0;
 
     char* equals_str = nat_equals(&num_para, c, c_equals, true, &equals_str_len, &leading_trues);
@@ -2350,7 +2350,7 @@ char* nat_get_factors(char* c_str, __int64 c_str_buf_sz, __int64 * len_para) {
         char a[6];
         char b[6];
         char c[6];
-        
+
         if (input[i][0] == -1)
             sprintf_s(a, 6, "%s", "");
         else if (input[i][0] == 1)
@@ -2385,7 +2385,29 @@ char* nat_get_factors(char* c_str, __int64 c_str_buf_sz, __int64 * len_para) {
     char* prime_str = new char[8];
     sprintf_s(prime_str, 8, "prime");
 
+    for (__int64 i = 0; i < num_para; i++)
+        sln[i] = false;
+
     bool is_sat = false;
+
+    /*
+
+    __int64 chops = 5 + 8;
+    __int64 search_sz = 1;
+
+    for (__int64 i = 0; i < chops; i++)
+        search_sz = search_sz * 2;
+
+    for (__int64 i = 0; i < search_sz; i++) {
+
+        if (is_sat)
+            break;
+
+        SATSolver* s = new SATSolver();
+        SATSolver_create(s, input, k, num_para, chops, i, leading_trues);
+        is_sat |= SATSolver_isSat(s, sln);
+    }
+    //*/
 
     is_sat = SATSolver_threads(input, k, num_para, sln, leading_trues);
 

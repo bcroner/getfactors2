@@ -98,6 +98,12 @@ void SATSolver_create(SATSolver* s, __int64** lst, __int64 k, __int64 n, __int64
 
     s->Z = SATSolver_create_boundary(true, chops, chop, n, leading_trues);
 
+    /*
+	for (__int64 i = 0; i < n; i++)
+        printf_s("%d", s->Z[i] ? 1 : 0);
+	printf_s("\n");
+    //*/
+
     s->inopcell_l = new __int64[k];
     s->inopcell_m = new __int64[k];
     s->inopcell_r = new __int64[k];
@@ -681,7 +687,7 @@ bool SATSolver_isSat(SATSolver* s, bool* sln) {
             }
         } while (changed);
 
-        // printf_s("ix: %lld\n", ix);
+        //printf_s("ix: %lld\n", ix);
 
         __int64 size_2sat = 0;
 
