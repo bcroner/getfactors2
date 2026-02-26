@@ -11,8 +11,8 @@
 #include <future>
 #include <list>
 #include <random>
-#include "thread_pool.hpp"
-#include "thread_pool_callable.hpp"
+#include "thread-pool/thread_pool.hpp"
+#include "thread-pool/thread_pool_callable.hpp"
 #include <stdio.h>
 #include <thread>
 #include <condition_variable>
