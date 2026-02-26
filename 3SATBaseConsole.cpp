@@ -11,8 +11,8 @@
 #include <future>
 #include <list>
 #include <random>
-#include "thread-pool/thread_pool.hpp"
-#include "thread-pool/thread_pool_callable.hpp"
+#include "thread-pool/thread_pool.hpp"              // https://github.com/mtrebi/thread-pool
+#include "thread-pool/thread_pool_callable.hpp"     // https://github.com/mtrebi/thread-pool
 #include <stdio.h>
 #include <thread>
 #include <condition_variable>
